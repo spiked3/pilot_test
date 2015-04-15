@@ -1,0 +1,33 @@
+﻿<Window x:Class="pilot_test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:spiked3="clr-namespace:spiked3"
+        Title="MainWindow" Height="673.45" Width="849" Loaded="Window_Loaded" Closing="Window_Closing">
+    <DockPanel LastChildFill="True">
+        <spiked3:Console DockPanel.Dock="Bottom" x:Name="console1" Grid.Row="2" Height="240" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <WrapPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
+                <WrapPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="118" />
+                        <Setter Property="Height" Value="64" />
+                        <Setter Property="Margin" Value="4" />
+                    </Style>
+                </WrapPanel.Resources>
+                <Button Click="Button_OpenSerial" >Open Serial</Button>
+                <Button Click="Button_CloseSerial" >Close Serial</Button>
+                <Button Click="Button_Test1" >Test1</Button>
+                <Button Click="Button_ResetPose" >Reset Pose</Button>
+                <Button Click="Button_EscOn" >Esc On</Button>
+                <Button Click="Button_EscOff" >Esc Off</Button>
+                <Button Click="Button_MMax100" >MotorMax 100</Button>
+                <Button Click="Button_MMax80" >MotorMax 80</Button>
+                <Button Click="Button_Sweep" >Sweep</Button>
+
+                <Button Click="Button_HbOff" >HB Off</Button>
+                <Button Click="Button_Hb500" >HB 500</Button>
+                <Button Click="Button_Hb2000">HB 20000</Button>
+            </WrapPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
