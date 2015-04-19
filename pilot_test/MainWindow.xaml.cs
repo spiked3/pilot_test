@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 
 using Newtonsoft.Json;
 using System.Windows.Threading;
+using System.Windows.Controls.Primitives;
 
 namespace pilot_test
 {
@@ -32,7 +33,7 @@ namespace pilot_test
         private void Button_OpenSerial(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_OpenSerial");
-            Serial = new SerialPort("com4", 115200);
+            Serial = new SerialPort("com3", 115200);
             try
             {
                 Serial.Open();
@@ -128,10 +129,13 @@ namespace pilot_test
 
         void SerialSend(string t)
         {
-            Trace.WriteLine("com<-" + t);
-            Serial.WriteLine(t);
-            System.Threading.Thread.Sleep(100);  //  really needed :(
-            DoEvents();
+            if (Serial != null && Serial.IsOpen)
+            {
+                Trace.WriteLine("com<-" + t);
+                Serial.WriteLine(t);
+                System.Threading.Thread.Sleep(200);  //  really needed :(
+                DoEvents();
+            }
         }
 
         private void Button_Test1(object sender, RoutedEventArgs e)
@@ -220,16 +224,24 @@ namespace pilot_test
             SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Reset""}");
         }
 
-        private void Button_EscOn(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_EscOn");
-            SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Esc"",""Value"":1}");
-        }
+		private void Button_EStop(object sender, RoutedEventArgs e)
+		{
+			SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
+			SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Power"",""Value"":0}");
+		}
 
-        private void Button_EscOff(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_EscOn");
-            SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
-        }
-    }
+		private void ToggleButton_Esc(object sender, RoutedEventArgs e)
+		{
+			Trace.WriteLine("::ToggleButton_Esc");
+			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
+			SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Esc"",""Value"":" + OnOff + "}");
+		}
+
+		private void ToggleButton_Bumper(object sender, RoutedEventArgs e)
+		{
+			Trace.WriteLine("::ToggleButton_Bumper");
+			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
+			SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Bumper"",""Value"":" + OnOff + "}");
+		}
+	}
 }
