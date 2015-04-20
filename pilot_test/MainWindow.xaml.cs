@@ -39,8 +39,7 @@ namespace pilot_test
             {
                 Serial.Open();
                 Serial.WriteTimeout = 200;
-                Serial.ErrorReceived += Serial_ErrorReceived;
-                Serial.DataReceived += Serial_DataReceived;
+                newSerialHandler(Serial);
             }
             catch (Exception ex)
             {
@@ -48,14 +47,8 @@ namespace pilot_test
             }
         }
 
-        void Serial_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
-        {
-            //System.Diagnostics.Debugger.Break();
-            Trace.WriteLine(e.EventType);
-        }
-
         int recvIdx = 0;
-        byte[] recvbuf = new byte[2048];
+        byte[] recvbuf = new byte[8192];
 
         void DoLine(string line)
         {
@@ -88,15 +81,13 @@ namespace pilot_test
                 Trace.WriteLine("com->" + line);
         }
 
-        private void Serial_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        void raiseAppSerialDataEvent(byte[] received)
         {
-            while (Serial.BytesToRead > 0)
+            foreach (var b in received)
             {
-                int c = Serial.ReadByte();
-
-                if (c == '\r')
+                if (b == '\r')
                     continue;
-                else if (c == '\n')
+                else if (b == '\n')
                 {
                     recvbuf[recvIdx] = 0;
                     DoLine(Encoding.UTF8.GetString(recvbuf, 0, recvIdx));
@@ -104,7 +95,7 @@ namespace pilot_test
                     continue;
                 }
                 else
-                    recvbuf[recvIdx] = (byte)c;
+                    recvbuf[recvIdx] = (byte)b;
 
                 recvIdx++;
                 if (recvIdx >= recvbuf.Length)
@@ -115,14 +106,9 @@ namespace pilot_test
             }
         }
 
-        void raiseAppSerialDataEvent(byte[] received)
-        {
-
-        }
-
         void newSerialHandler(SerialPort port)
         {
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[8192];
             Action kickoffRead = null;
             kickoffRead = delegate
             {
@@ -186,7 +172,6 @@ namespace pilot_test
             Trace.WriteLine("::Button_CloseSerial");
             if (Serial != null && Serial.IsOpen)
             {
-                Serial.DataReceived -= Serial_DataReceived;
                 Serial.Close();
             }
         }
