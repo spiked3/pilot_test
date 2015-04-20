@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using Newtonsoft.Json;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
+using System.IO;
 
 namespace pilot_test
 {
@@ -54,7 +55,7 @@ namespace pilot_test
         }
 
         int recvIdx = 0;
-        byte[] recvbuf = new byte[1024];
+        byte[] recvbuf = new byte[2048];
 
         void DoLine(string line)
         {
@@ -114,6 +115,37 @@ namespace pilot_test
             }
         }
 
+        void raiseAppSerialDataEvent(byte[] received)
+        {
+
+        }
+
+        void newSerialHandler(SerialPort port)
+        {
+            byte[] buffer = new byte[2048];
+            Action kickoffRead = null;
+            kickoffRead = delegate
+            {
+                port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate(IAsyncResult ar)
+                {
+                    try
+                    {
+                        int actualLength = port.BaseStream.EndRead(ar);
+                        byte[] received = new byte[actualLength];
+                        Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
+                        raiseAppSerialDataEvent(received);
+                    }
+                    catch (IOException exc)
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }
+                    kickoffRead();
+                }, null);
+            };
+            kickoffRead();
+        }
+    
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             spiked3.Console.MessageLevel = 4;   // default
@@ -141,7 +173,12 @@ namespace pilot_test
         private void Button_Test1(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
-            SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Test1""}");
+            //SerialSend(@"{""Topic"":""Cmd/robot1"",""T"":""Cmd"",""Cmd"":""Test1""}");
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 1}");
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Power"", ""Value"" : 40}");
+            System.Threading.Thread.Sleep(2000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Power"", ""Value"" : 0}");
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 0}");
         }
 
         private void Button_CloseSerial(object sender, RoutedEventArgs e)
