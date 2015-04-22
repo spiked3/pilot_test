@@ -11,7 +11,14 @@
                 <TextBlock Text="{Binding SerialIsOpen,FallbackValue=NA}" VerticalAlignment="Center" Margin="4,0,4,0"/>
             </StackPanel>
         </StatusBar>
-        <spiked3:Console DockPanel.Dock="Bottom" x:Name="console1" Grid.Row="2" Height="240" />
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="3*" />
+            </Grid.RowDefinitions>
+            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <spiked3:Console x:Name="console1" Grid.Row="2" VerticalAlignment="Stretch" />
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <WrapPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
                 <WrapPanel.Resources>
@@ -24,11 +31,11 @@
                         <Setter Property="Width" Value="118" />
                         <Setter Property="Height" Value="64" />
                         <Setter Property="Margin" Value="4" />
+                        <Setter Property="Background" Value="WhiteSmoke" />
                     </Style>
                 </WrapPanel.Resources>
                 <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" >EStop</Button>
-                <Button Click="Button_OpenSerial" >Open Serial</Button>
-                <Button Click="Button_CloseSerial" >Close Serial</Button>
+                <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" >Serial</ToggleButton>                
                 <Button Click="Button_Test1" >Test1</Button>
                 <Button Click="Test2_Click" >Test2</Button>
                 <Button Click="Button_ResetPose" >Reset Pose</Button>
@@ -43,5 +50,6 @@
                 <Button Click="Button_Hb2000">HB 20000</Button>
             </WrapPanel>
         </ScrollViewer>
+        </Grid>
     </DockPanel>
 </Window>

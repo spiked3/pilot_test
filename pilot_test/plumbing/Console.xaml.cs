@@ -112,9 +112,13 @@ namespace spiked3
                     int i = ListBox.Items.Add(t);
                     if (ListBox.Items.Count > 1024)
                         ListBox.Items.RemoveAt(0);  // expensive I bet :(
-                    var sv = ListBox.TryFindParent<ScrollViewer>();
-                    if (sv != null)
-                        sv.ScrollToBottom();  //  +++  not doing it
+
+                    // ListBox.ScrollIntoView(ListBox.Items[ListBox.Items.Count - 1]);
+                    ListBox.ScrollIntoView(t);                    
+
+                    //var sv = ListBox.TryFindParent<ScrollViewer>();
+                    //if (sv != null)
+                    //    sv.ScrollToBottom();  //  +++  not doing it
                 });
             }
 

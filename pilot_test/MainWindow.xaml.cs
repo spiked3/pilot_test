@@ -44,21 +44,32 @@ namespace pilot_test
             InitializeComponent();
         }
 
-        private void Button_OpenSerial(object sender, RoutedEventArgs e)
+        private void Button_Serial(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_OpenSerial");
-            Serial = new SerialPort("com3", 115200);
-            try
+            Trace.WriteLine("::Button_Serial");
+            if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Serial.Open();
-                Serial.WriteTimeout = 200;
-                SerialHandler(Serial);
+                Serial = new SerialPort("com4", 115200);
+                try
+                {
+                    Serial.Open();
+                    Serial.WriteTimeout = 200;
+                    SerialHandler(Serial);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message);
+                }
+                SerialIsOpen = Serial.IsOpen;
             }
-            catch (Exception ex)
+            else
             {
-                Trace.WriteLine(ex.Message);
+                if (Serial != null && Serial.IsOpen)
+                {
+                    Serial.Close();
+                    SerialIsOpen = Serial.IsOpen;
+                }
             }
-            SerialIsOpen = Serial.IsOpen;
         }
 
         void ProcessLine(string line)
@@ -178,7 +189,8 @@ namespace pilot_test
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Button_CloseSerial(sender, null);
+            if (Serial != null && Serial.IsOpen)
+                Serial.Close();
         }
 
         void SerialSend(string t)
@@ -189,16 +201,6 @@ namespace pilot_test
                 Serial.WriteLine(t);
                 System.Threading.Thread.Sleep(200);  //  really needed :(
                 DoEvents();
-            }
-        }
-
-        private void Button_CloseSerial(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_CloseSerial");
-            if (Serial != null && Serial.IsOpen)
-            {
-                Serial.Close();
-                SerialIsOpen = Serial.IsOpen;
             }
         }
 
