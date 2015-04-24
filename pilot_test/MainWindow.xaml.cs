@@ -212,16 +212,15 @@ namespace pilot_test
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
         }
 
-        //----------------------------------------------------------------
+        //-- TDD --------------------------------------------------------------
 
         private void Button_Test1(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
-            //SerialSend(@"{""T"":""Cmd"",""Cmd"":""Test1""}");
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 1}");
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Power"", ""Value"" : 50}");
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : 50}");  // raw M1/2 Power
             System.Threading.Thread.Sleep(2000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Power"", ""Value"" : 0}");
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 0}");
         }
 
@@ -229,7 +228,33 @@ namespace pilot_test
         {
             SerialSend(@"{""T"":""Cmd"",""Cmd"":""Test2""}");
         }
-        
+
+        private void Button_Sweep(object sender, RoutedEventArgs e)
+        {
+            const int dly = 200;
+            Trace.WriteLine("::Button_Sweep");
+            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":1}");
+
+            for (int i = 10; i <= 100; i += 10)
+            {
+                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                Thread.Sleep(dly);
+            }
+            for (int i = 100; i >= -100; i -= 10)
+            {
+                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                Thread.Sleep(dly);
+            }
+            for (int i = -100; i <= 0; i += 10)
+            {
+                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                Thread.Sleep(dly);
+            }
+
+            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
+        }
+
+       
         //----------------------------------------------------------------
 
         private void Button_HbOff(object sender, RoutedEventArgs e)
@@ -260,31 +285,6 @@ namespace pilot_test
         {
             Trace.WriteLine("::Button_MMax80");
             SerialSend(@"{""T"":""Cmd"",""Cmd"":""MMax"",""Value"":80}");
-        }
-
-        private void Button_Sweep(object sender, RoutedEventArgs e)
-        {
-            const int dly = 200;
-            Trace.WriteLine("::Button_Sweep");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":1}");
-
-            for (int i = 10; i <= 100; i += 10)
-            {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-            for (int i = 100; i >= -100; i -= 10)
-            {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-            for (int i = -100; i <= 0; i += 10)
-            {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
         }
 
         private void Button_ResetPose(object sender, RoutedEventArgs e)
