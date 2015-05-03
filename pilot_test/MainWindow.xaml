@@ -13,7 +13,7 @@
         </StatusBar>
         <Grid >
             <Grid.RowDefinitions>
-                <RowDefinition Height="5*" />
+                <RowDefinition Height="1*" />
                 <RowDefinition Height="4" />
                 <RowDefinition Height="3*" />
             </Grid.RowDefinitions>
@@ -35,19 +35,20 @@
                     </Style>
                 </WrapPanel.Resources>
                 <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" >EStop</Button>
-                <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" >Serial</ToggleButton>                
-                <Button Click="Button_Test1" >Test1</Button>
-                <Button Click="Test2_Click" >Test2</Button>
-                <Button Click="Button_ResetPose" >Reset Pose</Button>
+                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" >Serial</ToggleButton>
+                    <Button Click="Button_Test1" >Test1</Button>
+                    <Button Click="Test2_Click" >Test2</Button>
+
+                    <Button Click="Button_ResetPose" Background="Yellow" >Reset Pose</Button>
+                
                 <ToggleButton Checked="ToggleButton_Bumper" Unchecked="ToggleButton_Bumper" IsChecked="True" >Bumper</ToggleButton>
                 <ToggleButton Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" >Esc</ToggleButton>
-                <Button Click="Button_MMax100" >MotorMax 100</Button>
-                <Button Click="Button_MMax80" >MotorMax 80</Button>
-                <Button Click="Button_Sweep" >Sweep</Button>
-
+                
+                <Button Click="Button_Sweep" >Sweep</Button>                
+                
                 <Button Click="Button_HbOff" >HB Off</Button>
                 <Button Click="Button_Hb500" >HB 500</Button>
-                <Button Click="Button_Hb2000">HB 20000</Button>
+                <Button Click="Button_Hb2000">HB 2000</Button>
             </WrapPanel>
         </ScrollViewer>
         </Grid>

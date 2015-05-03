@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.IO;
 using System.Threading;
+using pilot_test.Properties;
 
 namespace pilot_test
 {
@@ -42,6 +43,18 @@ namespace pilot_test
         public MainWindow()
         {
             InitializeComponent();
+
+            Width = Settings.Default.Width;
+            Height = Settings.Default.Height;
+            Top = Settings.Default.Top;
+            Left = Settings.Default.Left;
+
+            if (Width == 0 || Height == 0)
+            {
+                Width = 640;
+                Height = 480;
+            }
+
         }
 
         private void Button_Serial(object sender, RoutedEventArgs e)
@@ -102,8 +115,6 @@ namespace pilot_test
             else
             {
                 Trace.WriteLine("com->" + line);
-                if (line.StartsWith("SUB"))
-                    return;
                 string type = "";
                 try
                 {
@@ -118,7 +129,7 @@ namespace pilot_test
                 {
                     case "Log":
                         break;
-                    case "EVT":
+                    case "???":
                         break;
                 }
             }
@@ -191,6 +202,12 @@ namespace pilot_test
         {
             if (Serial != null && Serial.IsOpen)
                 Serial.Close();
+
+            Settings.Default.Width = (float)((Window)sender).Width;
+            Settings.Default.Height = (float)((Window)sender).Height;
+            Settings.Default.Top = (float)((Window)sender).Top;
+            Settings.Default.Left = (float)((Window)sender).Left;
+            Settings.Default.Save();
         }
 
         void SerialSend(string t)
@@ -217,100 +234,117 @@ namespace pilot_test
         private void Button_Test1(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 1}");
+            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
+            //SerialSend(@"{""Cmd"":""Test1""}");
+
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : 50}");  // raw M1/2 Power
-            System.Threading.Thread.Sleep(2000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""Esc"", ""Value"" : 0}");
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 75, ""2"" : 35}");  // raw M1/2 Power
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 30, ""2"" : 70}");  // raw M1/2 Power
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : -50, ""2"" : -50}");  // raw M1/2 Power
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : -50}");  // raw M1/2 Power
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : -50, ""2"" : 50}");  // raw M1/2 Power
+            Thread.Sleep(1000);
+            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");  // raw M1/2 Power
+
         }
 
         private void Test2_Click(object sender, RoutedEventArgs e)
         {
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Test2""}");
+            SerialSend(@"{""Cmd"":""Test2""}");
+            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 0}");
         }
-
+            
         private void Button_Sweep(object sender, RoutedEventArgs e)
         {
             const int dly = 200;
             Trace.WriteLine("::Button_Sweep");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":1}");
+            SerialSend(@"{""Cmd"":""Esc"",""Value"":1}");
 
             for (int i = 10; i <= 100; i += 10)
             {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
                 Thread.Sleep(dly);
             }
             for (int i = 100; i >= -100; i -= 10)
             {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
                 Thread.Sleep(dly);
             }
             for (int i = -100; i <= 0; i += 10)
             {
-                SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":" + i + "}");
+                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
                 Thread.Sleep(dly);
             }
 
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
+            SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
         }
 
-       
         //----------------------------------------------------------------
 
         private void Button_HbOff(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Heartbeat"",""Value"":0}");
+            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":0}");
         }
 
         private void Button_Hb500(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb500");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Heartbeat"",""Value"":1,""Int"":500}");
+            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":1,""Int"":500}");
         }
 
         private void Button_Hb2000(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb2000");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Heartbeat"",""Value"":1,""Int"":2000}");
+            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":1,""Int"":2000}");
         }
 
         private void Button_MMax100(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_MMax100");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""MMax"",""Value"":100}");
+            SerialSend(@"{""Cmd"":""MMax"",""Value"":100}");
         }
 
         private void Button_MMax80(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_MMax80");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""MMax"",""Value"":80}");
+            SerialSend(@"{""Cmd"":""MMax"",""Value"":80}");
         }
 
         private void Button_ResetPose(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_ResetPose");
-            SerialSend(@"{""T"":""Cmd"",""Cmd"":""Reset""}");
+            SerialSend(@"{""Cmd"":""Reset""}");
         }
 
 		private void Button_EStop(object sender, RoutedEventArgs e)
 		{
-			SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":0}");
-			SerialSend(@"{""T"":""Cmd"",""Cmd"":""Power"",""Value"":0}");
+			SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
+			SerialSend(@"{""Cmd"":""Power"",""Value"":0}");
 		}
 
 		private void ToggleButton_Esc(object sender, RoutedEventArgs e)
 		{
 			Trace.WriteLine("::ToggleButton_Esc");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SerialSend(@"{""T"":""Cmd"",""Cmd"":""Esc"",""Value"":" + OnOff + "}");
+			SerialSend(@"{""Cmd"":""Esc"",""Value"":" + OnOff + "}");
 		}
 
 		private void ToggleButton_Bumper(object sender, RoutedEventArgs e)
 		{
 			Trace.WriteLine("::ToggleButton_Bumper");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SerialSend(@"{""T"":""Cmd"",""Cmd"":""Bumper"",""Value"":" + OnOff + "}");
+			SerialSend(@"{""Cmd"":""Bumper"",""Value"":" + OnOff + "}");
 		}
+
+        private void Reset(object sender, RoutedEventArgs e)
+        {
+            SerialSend(@"{""Cmd"":""Reset""}");
+        }
 	}
 }
