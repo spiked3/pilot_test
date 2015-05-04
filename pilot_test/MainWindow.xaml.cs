@@ -229,9 +229,7 @@ namespace pilot_test
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
         }
 
-        //-- TDD --------------------------------------------------------------
-
-        private void Button_Test1(object sender, RoutedEventArgs e)
+        private void Test1_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
             SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
@@ -250,15 +248,30 @@ namespace pilot_test
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : -50, ""2"" : 50}");  // raw M1/2 Power
             Thread.Sleep(1000);
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");  // raw M1/2 Power
-
         }
 
-        private void Test2_Click(object sender, RoutedEventArgs e)
+        private void M1_100_Click(object sender, RoutedEventArgs e)
         {
-            SerialSend(@"{""Cmd"":""Test2""}");
-            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 0}");
+            //SerialSend(@"{""Cmd"":""Test2""}");
+            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
+            SerialSend(@"{""Cmd"" : ""M"", ""1"":90}");
+            //Thread.Sleep(1000);
+            //SerialSend(@"{""Cmd"" : ""M"", ""1"":0}");
         }
-            
+
+        private void Test3_Click(object sender, RoutedEventArgs e)
+        {
+            // critical you include the decimal point (json decoding rqmt)
+            Trace.WriteLine("::Test3_Click");
+            SerialSend(@"{""Cmd"" : ""PID"", ""Idx"":0,""P"":.4,""I"":0.,""D"":.01}");
+        }
+
+        private void Test4_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Test4_Click");
+            SerialSend(@"{""Cmd"" : ""Geom"", ""TPR"":60,""Diam"":175.,""Base"":220.,""mMax"":450}");
+        }
+
         private void Button_Sweep(object sender, RoutedEventArgs e)
         {
             const int dly = 200;
@@ -304,18 +317,6 @@ namespace pilot_test
             SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":1,""Int"":2000}");
         }
 
-        private void Button_MMax100(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_MMax100");
-            SerialSend(@"{""Cmd"":""MMax"",""Value"":100}");
-        }
-
-        private void Button_MMax80(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_MMax80");
-            SerialSend(@"{""Cmd"":""MMax"",""Value"":80}");
-        }
-
         private void Button_ResetPose(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_ResetPose");
@@ -324,8 +325,8 @@ namespace pilot_test
 
 		private void Button_EStop(object sender, RoutedEventArgs e)
 		{
-			SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
-			SerialSend(@"{""Cmd"":""Power"",""Value"":0}");
+            SerialSend(@"{""Cmd"":""M"",""1"":0,""2"":0}");
+            SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
 		}
 
 		private void ToggleButton_Esc(object sender, RoutedEventArgs e)
@@ -341,10 +342,5 @@ namespace pilot_test
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
 			SerialSend(@"{""Cmd"":""Bumper"",""Value"":" + OnOff + "}");
 		}
-
-        private void Reset(object sender, RoutedEventArgs e)
-        {
-            SerialSend(@"{""Cmd"":""Reset""}");
-        }
 	}
 }

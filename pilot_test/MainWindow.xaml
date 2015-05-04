@@ -1,56 +1,67 @@
-﻿<Window x:Class="pilot_test.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:spiked3="clr-namespace:spiked3"
+        xmlns:local="clr-namespace:pilot_test" x:Class="pilot_test.MainWindow"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Spiked3.com Pilot V1R1 Tests" Height="673.45" Width="849" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner">
+        Title="Spiked3.com Pilot V1R1 Tests" Height="673.45" Width="849" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner"
+        >
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom" >
             <StackPanel Orientation="Horizontal" >
                 <Label Content="Serial Open: "  Margin="4,0,4,0"/>
-                <TextBlock Text="{Binding SerialIsOpen,FallbackValue=NA}" VerticalAlignment="Center" Margin="4,0,4,0"/>
+                <TextBlock Text="{Binding SerialIsOpen, FallbackValue=NA}" VerticalAlignment="Center" Margin="4,0,4,0"/>
             </StackPanel>
         </StatusBar>
         <Grid >
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="4" />
+                <RowDefinition Height="2.4*" />
                 <RowDefinition Height="3*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="6*" />
             </Grid.RowDefinitions>
-            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-        <spiked3:Console x:Name="console1" Grid.Row="2" VerticalAlignment="Stretch" />
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <WrapPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
-                <WrapPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Width" Value="118" />
-                        <Setter Property="Height" Value="64" />
-                        <Setter Property="Margin" Value="4" />
-                    </Style>
-                    <Style TargetType="ToggleButton">
-                        <Setter Property="Width" Value="118" />
-                        <Setter Property="Height" Value="64" />
-                        <Setter Property="Margin" Value="4" />
-                        <Setter Property="Background" Value="WhiteSmoke" />
-                    </Style>
-                </WrapPanel.Resources>
-                <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" >EStop</Button>
-                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" >Serial</ToggleButton>
-                    <Button Click="Button_Test1" >Test1</Button>
-                    <Button Click="Test2_Click" >Test2</Button>
+            <Grid Grid.Row="0" >
+                <WrapPanel >
+                    <local:pidControl />
+                    <local:ValueSliderControl x:Name="vsl1" />
+                </WrapPanel>
+            </Grid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                <WrapPanel >
+                    <WrapPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Width" Value="118" />
+                            <Setter Property="Height" Value="64" />
+                            <Setter Property="Margin" Value="4" />
+                        </Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Setter Property="Width" Value="118" />
+                            <Setter Property="Height" Value="64" />
+                            <Setter Property="Margin" Value="4" />
+                            <Setter Property="Background" Value="WhiteSmoke" />
+                        </Style>
+                    </WrapPanel.Resources>
+                    <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="EStop" />
+                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Serial" />
+                    <!--<Button Click="Test1_Click" Content="Test1" />-->
+                    <Button Click="M1_100_Click" Content="M1=100" />
+                    <Button Click="Test3_Click" Content="PID" />
+                    <Button Click="Test4_Click" Content="Geom" />
 
-                    <Button Click="Button_ResetPose" Background="Yellow" >Reset Pose</Button>
-                
-                <ToggleButton Checked="ToggleButton_Bumper" Unchecked="ToggleButton_Bumper" IsChecked="True" >Bumper</ToggleButton>
-                <ToggleButton Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" >Esc</ToggleButton>
-                
-                <Button Click="Button_Sweep" >Sweep</Button>                
-                
-                <Button Click="Button_HbOff" >HB Off</Button>
-                <Button Click="Button_Hb500" >HB 500</Button>
-                <Button Click="Button_Hb2000">HB 2000</Button>
-            </WrapPanel>
-        </ScrollViewer>
+                    <Button Click="Button_ResetPose" Background="Yellow" Content="Reset Pose" />
+
+                    <ToggleButton Checked="ToggleButton_Bumper" Unchecked="ToggleButton_Bumper" IsChecked="True" Content="Bumper" />
+                    <ToggleButton Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" Content="Esc" />
+
+                    <Button Click="Button_Sweep" Content="Sweep" />
+
+                    <Button Click="Button_HbOff" Content="HB Off" />
+                    <Button Click="Button_Hb500" Content="HB 500" />
+                    <Button Click="Button_Hb2000" Content="HB 2000"/>
+                </WrapPanel>
+            </ScrollViewer>
+            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <spiked3:Console x:Name="console1" Grid.Row="3" VerticalAlignment="Stretch" />
         </Grid>
     </DockPanel>
 </Window>

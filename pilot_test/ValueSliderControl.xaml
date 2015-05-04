@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="pilot_test.ValueSliderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             >
+    <DockPanel >
+        <DockPanel.Resources>
+        <Style TargetType="DockPanel" >
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Slider" >
+            <Setter Property="TickFrequency" Value="5" />
+            <Setter Property="TickPlacement" Value="BottomRight" />
+            <Setter Property="IsSnapToTickEnabled" Value="True" />
+            <Setter Property="MinWidth" Value="128" />
+        </Style>
+            <Style TargetType="TextBox" >
+                <Setter Property="DockPanel.Dock" Value="Right" />
+                <Setter Property="TextAlignment" Value="Right" />
+                <Setter Property="Width" Value="40" />
+            </Style>
+        </DockPanel.Resources>
+
+            <Label Content="{Binding Text,FallbackValue=SliderText}" />
+            <TextBox Text="{Binding ElementName=slider1,Path=Value,UpdateSourceTrigger=PropertyChanged}" />
+            <Slider x:Name="slider1" Maximum="{Binding Min}" Minimum="{Binding Min}" Value="{Binding Value}" />
+        </DockPanel>
+</UserControl>
