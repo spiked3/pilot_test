@@ -22,8 +22,8 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" >
                 <WrapPanel >
-                    <local:pidControl />
                     <local:ValueSliderControl x:Name="vsl1" />
+                    <local:pidControl />
                 </WrapPanel>
             </Grid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
@@ -44,7 +44,7 @@
                     <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="EStop" />
                     <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Serial" />
                     <!--<Button Click="Test1_Click" Content="Test1" />-->
-                    <Button Click="M1_100_Click" Content="M1=100" />
+                    <Button Click="M1_Click" Content="M1 Power" />
                     <Button Click="Test3_Click" Content="PID" />
                     <Button Click="Test4_Click" Content="Geom" />
 

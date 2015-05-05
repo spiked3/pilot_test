@@ -27,15 +27,59 @@ namespace pilot_test
     public partial class MainWindow : Window
     {
         private SerialPort Serial;
-
+       public float Kp
+        {
+            get { return (float)GetValue(KpProperty); }
+            set { SetValue(KpProperty, value); }
+        }
+        public static readonly DependencyProperty KpProperty =
+            DependencyProperty.Register("Kp", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kp));
+        public float Ki
+        {
+            get { return (float)GetValue(KiProperty); }
+            set { SetValue(KiProperty, value); }
+        }
+        public static readonly DependencyProperty KiProperty =
+            DependencyProperty.Register("Ki", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Ki));
+        public float Kd
+        {
+            get { return (float)GetValue(KdProperty); }
+            set { SetValue(KdProperty, value); }
+        }
+        public static readonly DependencyProperty KdProperty =
+            DependencyProperty.Register("Kd", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kd));
         public bool? SerialIsOpen
         {
             get { return Serial != null && Serial.IsOpen; }
             set { SetValue(SerialIsOpenProperty, value); }
         }
-
         public static readonly DependencyProperty SerialIsOpenProperty =
             DependencyProperty.Register("SerialIsOpen", typeof(bool?), typeof(MainWindow), new PropertyMetadata(false));
+
+        public float MotorPower
+        {
+            get { return (float)GetValue(MotorPowerProperty); }
+            set { SetValue(MotorPowerProperty, value); }
+        }
+        public static readonly DependencyProperty MotorPowerProperty =
+            DependencyProperty.Register("MotorPower", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorPower));
+
+        public float MotorMin
+        {
+            get { return (float)GetValue(MotorMinProperty); }
+            set { SetValue(MotorMinProperty, value); }
+        }
+        public static readonly DependencyProperty MotorMinProperty =
+            DependencyProperty.Register("MotorMin", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMin));
+
+        public float MotorMax
+        {
+            get { return (float)GetValue(MotorMaxProperty); }
+            set { SetValue(MotorMaxProperty, value); }
+        }
+        public static readonly DependencyProperty MotorMaxProperty =
+            DependencyProperty.Register("MotorMax", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMax));
+
 
         int recvIdx = 0;
         byte[] recvbuf = new byte[1024];
@@ -44,6 +88,11 @@ namespace pilot_test
         {
             InitializeComponent();
 
+            RestoreVars();
+        }
+
+        void RestoreVars()
+        {
             Width = Settings.Default.Width;
             Height = Settings.Default.Height;
             Top = Settings.Default.Top;
@@ -54,7 +103,22 @@ namespace pilot_test
                 Width = 640;
                 Height = 480;
             }
+        }
 
+        void SaveVars()
+        {
+            Settings.Default.Width = (float)Width;
+            Settings.Default.Height = (float)Height;
+            Settings.Default.Top = (float)Top;
+            Settings.Default.Left = (float)Left;
+
+            Settings.Default.MotorMax = MotorMax;
+            Settings.Default.MotorMin = MotorMin;
+            Settings.Default.MotorPower = MotorPower;
+            Settings.Default.Kp = Kp;
+            Settings.Default.Ki = Ki;
+            Settings.Default.Kd = Kd;
+            Settings.Default.Save();
         }
 
         private void Button_Serial(object sender, RoutedEventArgs e)
@@ -194,6 +258,8 @@ namespace pilot_test
         {
             spiked3.Console.MessageLevel = 4;   // default
 
+            RestoreVars();
+
             Trace.WriteLine("::Window_Loaded");
             Trace.WriteLine("Pilot v2 Test/QA", "+");
         }
@@ -203,11 +269,7 @@ namespace pilot_test
             if (Serial != null && Serial.IsOpen)
                 Serial.Close();
 
-            Settings.Default.Width = (float)((Window)sender).Width;
-            Settings.Default.Height = (float)((Window)sender).Height;
-            Settings.Default.Top = (float)((Window)sender).Top;
-            Settings.Default.Left = (float)((Window)sender).Left;
-            Settings.Default.Save();
+            SaveVars();
         }
 
         void SerialSend(string t)
@@ -250,11 +312,13 @@ namespace pilot_test
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");  // raw M1/2 Power
         }
 
-        private void M1_100_Click(object sender, RoutedEventArgs e)
+        private void M1_Click(object sender, RoutedEventArgs e)
         {
             //SerialSend(@"{""Cmd"":""Test2""}");
             SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
-            SerialSend(@"{""Cmd"" : ""M"", ""1"":90}");
+            string t = @"{""Cmd"" : ""M"", ""1"":" + MotorPower.ToString() + "}"; Trace.WriteLine(t);
+            SerialSend(t);
+
             //Thread.Sleep(1000);
             //SerialSend(@"{""Cmd"" : ""M"", ""1"":0}");
         }
@@ -263,7 +327,8 @@ namespace pilot_test
         {
             // critical you include the decimal point (json decoding rqmt)
             Trace.WriteLine("::Test3_Click");
-            SerialSend(@"{""Cmd"" : ""PID"", ""Idx"":0,""P"":.4,""I"":0.,""D"":.01}");
+            string t = @"{""Cmd"" : ""PID"", ""Idx"":0,""P"":" + Kp.ToString() + @",""I"":" + Ki.ToString() + @",""D"":" + Kd.ToString() + "}"; Trace.WriteLine(t);
+            SerialSend(t);
         }
 
         private void Test4_Click(object sender, RoutedEventArgs e)

@@ -17,7 +17,7 @@
                     <Setter Property="VerticalAlignment" Value="Center" />
                 </Style>
                 <Style TargetType="Slider" >
-                    <Setter Property="TickFrequency" Value="5" />
+                    <Setter Property="TickFrequency" Value=".05" />
                     <Setter Property="TickPlacement" Value="BottomRight" />
                     <Setter Property="IsSnapToTickEnabled" Value="True" />
                     <Setter Property="MinWidth" Value="128" />
@@ -35,20 +35,20 @@
             <TextBlock Text="PID" FontWeight="Bold" />
             <DockPanel >
                 <Label Content="Proportion" />
-                <TextBox Text="{Binding ElementName=slColorR, Path=Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <Slider Maximum="255" />
+                <TextBox Text="{Binding ElementName=slKp, Path=Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <Slider x:Name="slKp" Minimum="0" Maximum="1" Value="{Binding Kp}" />
             </DockPanel>
 
             <DockPanel >
                 <Label Content="Integral" />
-                <TextBox Text="{Binding ElementName=slColorG, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
-                <Slider Maximum="255" />
+                <TextBox Text="{Binding ElementName=slKi, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
+                <Slider x:Name="slKi" Minimum="0" Maximum="1" Value="{Binding Ki}" />
             </DockPanel>
 
             <DockPanel >
                 <Label Content="Derivitave" />
-                <TextBox Text="{Binding ElementName=slColorB, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
-                <Slider Maximum="255" />
+                <TextBox Text="{Binding ElementName=slKd, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
+                <Slider x:Name="slKd" Minimum="0" Maximum="1" Value="{Binding Kd}" />
             </DockPanel>
         </StackPanel>
     </Grid>
