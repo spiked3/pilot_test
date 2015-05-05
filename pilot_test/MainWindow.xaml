@@ -43,7 +43,7 @@
                     </WrapPanel.Resources>
                     <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="EStop" />
                     <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Serial" />
-                    <!--<Button Click="Test1_Click" Content="Test1" />-->
+                    <Button Click="Test1_Click" Content="Test1" />
                     <Button Click="M1_Click" Content="M1 Power" />
                     <Button Click="Test3_Click" Content="PID" />
                     <Button Click="Test4_Click" Content="Geom" />
@@ -51,9 +51,7 @@
                     <Button Click="Button_ResetPose" Background="Yellow" Content="Reset Pose" />
 
                     <ToggleButton Checked="ToggleButton_Bumper" Unchecked="ToggleButton_Bumper" IsChecked="True" Content="Bumper" />
-                    <ToggleButton Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" Content="Esc" />
-
-                    <Button Click="Button_Sweep" Content="Sweep" />
+                    <ToggleButton x:Name="tglEsc" Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" Content="Esc" />
 
                     <Button Click="Button_HbOff" Content="HB Off" />
                     <Button Click="Button_Hb500" Content="HB 500" />

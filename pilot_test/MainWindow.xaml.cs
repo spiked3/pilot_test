@@ -294,8 +294,7 @@ namespace pilot_test
         private void Test1_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
-            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
-            //SerialSend(@"{""Cmd"":""Test1""}");
+            tglEsc.IsChecked = true;
 
             SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : 50}");  // raw M1/2 Power
             Thread.Sleep(1000);
@@ -315,7 +314,7 @@ namespace pilot_test
         private void M1_Click(object sender, RoutedEventArgs e)
         {
             //SerialSend(@"{""Cmd"":""Test2""}");
-            SerialSend(@"{""Cmd"" : ""Esc"", ""Value"" : 1}");
+            tglEsc.IsChecked = true;
             string t = @"{""Cmd"" : ""M"", ""1"":" + MotorPower.ToString() + "}"; Trace.WriteLine(t);
             SerialSend(t);
 
@@ -336,33 +335,6 @@ namespace pilot_test
             Trace.WriteLine("::Test4_Click");
             SerialSend(@"{""Cmd"" : ""Geom"", ""TPR"":60,""Diam"":175.,""Base"":220.,""mMax"":450}");
         }
-
-        private void Button_Sweep(object sender, RoutedEventArgs e)
-        {
-            const int dly = 200;
-            Trace.WriteLine("::Button_Sweep");
-            SerialSend(@"{""Cmd"":""Esc"",""Value"":1}");
-
-            for (int i = 10; i <= 100; i += 10)
-            {
-                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-            for (int i = 100; i >= -100; i -= 10)
-            {
-                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-            for (int i = -100; i <= 0; i += 10)
-            {
-                SerialSend(@"{""Cmd"":""Power"",""Value"":" + i + "}");
-                Thread.Sleep(dly);
-            }
-
-            SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
-        }
-
-        //----------------------------------------------------------------
 
         private void Button_HbOff(object sender, RoutedEventArgs e)
         {
@@ -388,11 +360,12 @@ namespace pilot_test
             SerialSend(@"{""Cmd"":""Reset""}");
         }
 
-		private void Button_EStop(object sender, RoutedEventArgs e)
-		{
-            SerialSend(@"{""Cmd"":""M"",""1"":0,""2"":0}");
+        private void Button_EStop(object sender, RoutedEventArgs e)
+        {
             SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
-		}
+            SerialSend(@"{""Cmd"":""M"",""1"":0,""2"":0}");
+            tglEsc.IsChecked = false;
+        }
 
 		private void ToggleButton_Esc(object sender, RoutedEventArgs e)
 		{
