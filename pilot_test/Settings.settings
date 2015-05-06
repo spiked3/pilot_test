@@ -18,7 +18,7 @@
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="MotorMin" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">-100</Value>
     </Setting>
     <Setting Name="MotorPower" Type="System.Single" Scope="User">
       <Value Profile="(Default)">50</Value>

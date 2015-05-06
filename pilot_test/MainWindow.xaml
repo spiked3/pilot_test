@@ -7,6 +7,13 @@
         Title="Spiked3.com Pilot V1R1 Tests" Height="673.45" Width="849" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner"
         >
     <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" >
+            <MenuItem Header="_File" >
+                <MenuItem Header="_Save State" Click="SaveState_Click" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="ExitMenuItem_Click" />
+            </MenuItem>
+        </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <StackPanel Orientation="Horizontal" >
                 <Label Content="Serial Open: "  Margin="4,0,4,0"/>
@@ -14,6 +21,23 @@
             </StackPanel>
         </StatusBar>
         <Grid >
+            <Grid.Resources>
+                <Style TargetType="DockPanel" >
+                    <Setter Property="Margin" Value="4" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="Slider" >
+                    <Setter Property="TickFrequency" Value="10" />
+                    <Setter Property="TickPlacement" Value="BottomRight" />
+                    <Setter Property="IsSnapToTickEnabled" Value="True" />
+                    <Setter Property="MinWidth" Value="128" />
+                </Style>
+                <Style TargetType="TextBox" >
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="TextAlignment" Value="Right" />
+                    <Setter Property="Width" Value="40" />
+                </Style>
+            </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition Height="2.4*" />
                 <RowDefinition Height="3*" />
@@ -22,7 +46,11 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" >
                 <WrapPanel >
-                    <local:ValueSliderControl x:Name="vsl1" />
+                    <DockPanel>
+                        <Label Content="M1 Power" TabIndex="1"/>
+                        <TextBox Text="{Binding ElementName=slPower,Path=Value,UpdateSourceTrigger=PropertyChanged, Delay=500}" TabIndex="3"/>
+                        <Slider x:Name="slPower" Maximum="{Binding MotorMax}" Minimum="{Binding MotorMin}" Value="{Binding MotorPower, Delay=500}" ValueChanged="slPower_ValueChanged" TabIndex="2"/>
+                    </DockPanel>
                     <local:pidControl />
                 </WrapPanel>
             </Grid>
@@ -41,17 +69,17 @@
                             <Setter Property="Background" Value="WhiteSmoke" />
                         </Style>
                     </WrapPanel.Resources>
-                    <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="EStop" />
-                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Serial" />
+                    <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="E_Stop" />
+                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Seria_l" />
                     <Button Click="Test1_Click" Content="Test1" />
                     <Button Click="M1_Click" Content="M1 Power" />
-                    <Button Click="Test3_Click" Content="PID" />
-                    <Button Click="Test4_Click" Content="Geom" />
+                    <Button Click="Pid_Click" Content="PID" />
+                    <Button Click="Geom_Click" Content="Geom" />
 
                     <Button Click="Button_ResetPose" Background="Yellow" Content="Reset Pose" />
 
                     <ToggleButton Checked="ToggleButton_Bumper" Unchecked="ToggleButton_Bumper" IsChecked="True" Content="Bumper" />
-                    <ToggleButton x:Name="tglEsc" Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" Content="Esc" />
+                    <ToggleButton x:Name="tglEsc" Checked="ToggleButton_Esc" Unchecked="ToggleButton_Esc" Content="_Esc" />
 
                     <Button Click="Button_HbOff" Content="HB Off" />
                     <Button Click="Button_Hb500" Content="HB 500" />

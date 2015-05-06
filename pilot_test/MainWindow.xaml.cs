@@ -1,26 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
+using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
-using System.IO;
 using System.Threading;
-using pilot_test.Properties;
+using System.Dynamic;
 
 namespace pilot_test
 {
@@ -80,46 +67,11 @@ namespace pilot_test
         public static readonly DependencyProperty MotorMaxProperty =
             DependencyProperty.Register("MotorMax", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMax));
 
+        #region SerialCrap
 
         int recvIdx = 0;
         byte[] recvbuf = new byte[1024];
 
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            RestoreVars();
-        }
-
-        void RestoreVars()
-        {
-            Width = Settings.Default.Width;
-            Height = Settings.Default.Height;
-            Top = Settings.Default.Top;
-            Left = Settings.Default.Left;
-
-            if (Width == 0 || Height == 0)
-            {
-                Width = 640;
-                Height = 480;
-            }
-        }
-
-        void SaveVars()
-        {
-            Settings.Default.Width = (float)Width;
-            Settings.Default.Height = (float)Height;
-            Settings.Default.Top = (float)Top;
-            Settings.Default.Left = (float)Left;
-
-            Settings.Default.MotorMax = MotorMax;
-            Settings.Default.MotorMin = MotorMin;
-            Settings.Default.MotorPower = MotorPower;
-            Settings.Default.Kp = Kp;
-            Settings.Default.Ki = Ki;
-            Settings.Default.Kd = Kd;
-            Settings.Default.Save();
-        }
 
         private void Button_Serial(object sender, RoutedEventArgs e)
         {
@@ -254,24 +206,6 @@ namespace pilot_test
             kickoffRead();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            spiked3.Console.MessageLevel = 4;   // default
-
-            RestoreVars();
-
-            Trace.WriteLine("::Window_Loaded");
-            Trace.WriteLine("Pilot v2 Test/QA", "+");
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (Serial != null && Serial.IsOpen)
-                Serial.Close();
-
-            SaveVars();
-        }
-
         void SerialSend(string t)
         {
             if (Serial != null && Serial.IsOpen)
@@ -281,6 +215,60 @@ namespace pilot_test
                 System.Threading.Thread.Sleep(200);  //  really needed :(
                 DoEvents();
             }
+        }
+
+        void SerialSend(dynamic j)
+        {
+            if (Serial != null && Serial.IsOpen)
+                SerialSend(JsonConvert.SerializeObject(j));
+        }
+
+        #endregion
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            Width = Settings.Default.Width;
+            Height = Settings.Default.Height;
+            Top = Settings.Default.Top;
+            Left = Settings.Default.Left;
+
+            if (Width == 0 || Height == 0)
+            {
+                Width = 640;
+                Height = 480;
+            }
+        }
+
+        void SaveVars()
+        {
+            Settings.Default.Width = (float)Width;
+            Settings.Default.Height = (float)Height;
+            Settings.Default.Top = (float)Top;
+            Settings.Default.Left = (float)Left;
+
+            Settings.Default.MotorMax = MotorMax;
+            Settings.Default.MotorMin = MotorMin;
+            Settings.Default.MotorPower = MotorPower;
+            Settings.Default.Kp = Kp;
+            Settings.Default.Ki = Ki;
+            Settings.Default.Kd = Kd;
+            Settings.Default.Save();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            spiked3.Console.MessageLevel = 4;   // default
+            Trace.WriteLine("Pilot v2 Test / QA", "+");
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Serial != null && Serial.IsOpen)
+                Serial.Close();
+
+            SaveVars();
         }
 
         // yeah yeah, I know; everyone thinks do events is bad,
@@ -294,76 +282,55 @@ namespace pilot_test
         private void Test1_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Test1");
-            tglEsc.IsChecked = true;
-
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : 50}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 75, ""2"" : 35}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 30, ""2"" : 70}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : -50, ""2"" : -50}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 50, ""2"" : -50}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : -50, ""2"" : 50}");  // raw M1/2 Power
-            Thread.Sleep(1000);
-            SerialSend(@"{""T"" : ""Cmd"", ""Cmd"" : ""M"", ""1"" : 0, ""2"" : 0}");  // raw M1/2 Power
         }
 
         private void M1_Click(object sender, RoutedEventArgs e)
         {
-            //SerialSend(@"{""Cmd"":""Test2""}");
             tglEsc.IsChecked = true;
-            string t = @"{""Cmd"" : ""M"", ""1"":" + MotorPower.ToString() + "}"; Trace.WriteLine(t);
-            SerialSend(t);
-
-            //Thread.Sleep(1000);
-            //SerialSend(@"{""Cmd"" : ""M"", ""1"":0}");
+            SerialSend(new { Cmd = "Pwr", M1 = MotorPower });
         }
 
-        private void Test3_Click(object sender, RoutedEventArgs e)
+        private void Pid_Click(object sender, RoutedEventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt)
-            Trace.WriteLine("::Test3_Click");
-            string t = @"{""Cmd"" : ""PID"", ""Idx"":0,""P"":" + Kp.ToString() + @",""I"":" + Ki.ToString() + @",""D"":" + Kd.ToString() + "}"; Trace.WriteLine(t);
-            SerialSend(t);
+            Trace.WriteLine("::Pid_Click");
+            SerialSend(new { Cmd = "PID", Idx = 0, P = Kp, I = Ki, D = Kd });
         }
 
-        private void Test4_Click(object sender, RoutedEventArgs e)
+        private void Geom_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Test4_Click");
-            SerialSend(@"{""Cmd"" : ""Geom"", ""TPR"":60,""Diam"":175.,""Base"":220.,""mMax"":450}");
+            Trace.WriteLine("::Geom_Click");
+            SerialSend(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 });
         }
 
         private void Button_HbOff(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
-            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":0}");
+            SerialSend(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
         }
 
         private void Button_Hb500(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb500");
-            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":1,""Int"":500}");
+            SerialSend(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
         }
 
         private void Button_Hb2000(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb2000");
-            SerialSend(@"{""Cmd"":""Heartbeat"",""Value"":1,""Int"":2000}");
+            SerialSend(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
         }
 
         private void Button_ResetPose(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_ResetPose");
-            SerialSend(@"{""Cmd"":""Reset""}");
+            SerialSend(new { Cmd = "Reset" });
         }
 
         private void Button_EStop(object sender, RoutedEventArgs e)
         {
-            SerialSend(@"{""Cmd"":""Esc"",""Value"":0}");
-            SerialSend(@"{""Cmd"":""M"",""1"":0,""2"":0}");
+            SerialSend(new { Cmd = "Esc", Value = 0 });
+            SerialSend(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
             tglEsc.IsChecked = false;
         }
 
@@ -371,14 +338,29 @@ namespace pilot_test
 		{
 			Trace.WriteLine("::ToggleButton_Esc");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SerialSend(@"{""Cmd"":""Esc"",""Value"":" + OnOff + "}");
+			SerialSend(new { Cmd = "Esc", Value = OnOff });
 		}
 
 		private void ToggleButton_Bumper(object sender, RoutedEventArgs e)
 		{
 			Trace.WriteLine("::ToggleButton_Bumper");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SerialSend(@"{""Cmd"":""Bumper"",""Value"":" + OnOff + "}");
+            SerialSend(new { Cmd = "Bumper", Value = OnOff });
 		}
-	}
+
+        private void slPower_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            SerialSend(new { Cmd = "Pwr", M1 = slPower.Value });
+        }
+
+        private void SaveState_Click(object sender, RoutedEventArgs e)
+        {
+            SaveVars();
+        }
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+    }
 }
