@@ -362,5 +362,11 @@ namespace pilot_test
         {
             Close();
         }
+
+        private void Cali_Click(object sender, RoutedEventArgs e)
+        {
+            // this needs some testing!!
+            SerialSend(new { Cmd = "CALI", Vals = new int[] { -333, -3632,   2311, -1062,   28, -11 } });
+        }
     }
 }

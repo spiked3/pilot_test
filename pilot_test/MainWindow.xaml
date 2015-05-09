@@ -69,12 +69,13 @@
                             <Setter Property="Background" Value="WhiteSmoke" />
                         </Style>
                     </WrapPanel.Resources>
-                    <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="E_Stop" />
-                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="Seria_l" />
+                    <Button Click="Button_EStop" Background="Red" Foreground="White" FontWeight="ExtraBold" Content="ESto_p" />
+                    <ToggleButton Checked="Button_Serial" Unchecked="Button_Serial" Content="_Serial" />
                     <Button Click="Test1_Click" Content="Test1" />
                     <Button Click="M1_Click" Content="M1 Power" />
                     <Button Click="Pid_Click" Content="PID" />
                     <Button Click="Geom_Click" Content="Geom" />
+                    <Button Content="Cali" Click="Cali_Click" />
 
                     <Button Click="Button_ResetPose" Background="Yellow" Content="Reset Pose" />
 
