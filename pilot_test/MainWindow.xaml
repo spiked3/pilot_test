@@ -85,6 +85,7 @@
                     <Button Click="Button_HbOff" Content="HB Off" />
                     <Button Click="Button_Hb500" Content="HB 500" />
                     <Button Click="Button_Hb2000" Content="HB 2000"/>
+                    <Button Content="Hdg Rel" Click="HdgRel_Click"/>
                 </WrapPanel>
             </ScrollViewer>
             <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>

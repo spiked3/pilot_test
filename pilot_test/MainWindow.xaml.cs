@@ -368,5 +368,10 @@ namespace pilot_test
             // this needs some testing!!
             SerialSend(new { Cmd = "CALI", Vals = new int[] { -333, -3632,   2311, -1062,   28, -11 } });
         }
+
+        private void HdgRel_Click(object sender, RoutedEventArgs e)
+        {
+            SerialSend(new { Cmd = "Rot", Rel = 45 });
+        }
     }
 }
