@@ -78,7 +78,7 @@ namespace pilot_test
             Trace.WriteLine("::Button_Serial");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Serial = new SerialPort("com4", 115200);
+                Serial = new SerialPort("com7", 115200);
                 try
                 {
                     Serial.Open();
@@ -267,7 +267,6 @@ namespace pilot_test
         {
             if (Serial != null && Serial.IsOpen)
                 Serial.Close();
-
             SaveVars();
         }
 
@@ -287,7 +286,7 @@ namespace pilot_test
         private void M1_Click(object sender, RoutedEventArgs e)
         {
             tglEsc.IsChecked = true;
-            SerialSend(new { Cmd = "Pwr", M1 = MotorPower });
+            SerialSend(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
         }
 
         private void Pid_Click(object sender, RoutedEventArgs e)
@@ -350,7 +349,7 @@ namespace pilot_test
 
         private void slPower_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            SerialSend(new { Cmd = "Pwr", M1 = slPower.Value });
+            SerialSend(new { Cmd = "Pwr", M1 = slPower.Value, M2 = slPower.Value });
         }
 
         private void SaveState_Click(object sender, RoutedEventArgs e)
