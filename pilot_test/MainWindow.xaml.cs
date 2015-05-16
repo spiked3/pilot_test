@@ -217,7 +217,7 @@ namespace pilot_test
             }
         }
 
-        void SerialSend(dynamic j)
+        void SendPilot(dynamic j)
         {
             if (Serial != null && Serial.IsOpen)
                 SerialSend(JsonConvert.SerializeObject(j));
@@ -283,53 +283,53 @@ namespace pilot_test
             Trace.WriteLine("::Button_Test1");
         }
 
-        private void M1_Click(object sender, RoutedEventArgs e)
+        private void Power_Click(object sender, RoutedEventArgs e)
         {
             tglEsc.IsChecked = true;
-            SerialSend(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
+            SendPilot(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
         }
 
         private void Pid_Click(object sender, RoutedEventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt)
             Trace.WriteLine("::Pid_Click");
-            SerialSend(new { Cmd = "PID", Idx = 0, P = Kp, I = Ki, D = Kd });
+            SendPilot(new { Cmd = "PID", Idx = 0, P = Kp, I = Ki, D = Kd });
         }
 
         private void Geom_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Geom_Click");
-            SerialSend(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 });
+            SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 });
         }
 
-        private void Button_HbOff(object sender, RoutedEventArgs e)
+        private void HbOff_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
-            SerialSend(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
+            SendPilot(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
         }
 
-        private void Button_Hb500(object sender, RoutedEventArgs e)
+        private void Hb500_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb500");
-            SerialSend(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
+            SendPilot(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
         }
 
-        private void Button_Hb2000(object sender, RoutedEventArgs e)
+        private void Hb2000_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb2000");
-            SerialSend(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
+            SendPilot(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
         }
 
-        private void Button_ResetPose(object sender, RoutedEventArgs e)
+        private void ResetPose_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_ResetPose");
-            SerialSend(new { Cmd = "Reset" });
+            SendPilot(new { Cmd = "Reset" });
         }
 
-        private void Button_EStop(object sender, RoutedEventArgs e)
+        private void EStop_Click(object sender, RoutedEventArgs e)
         {
-            SerialSend(new { Cmd = "Esc", Value = 0 });
-            SerialSend(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
+            SendPilot(new { Cmd = "Esc", Value = 0 });
+            SendPilot(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
             tglEsc.IsChecked = false;
         }
 
@@ -337,19 +337,19 @@ namespace pilot_test
 		{
 			Trace.WriteLine("::ToggleButton_Esc");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SerialSend(new { Cmd = "Esc", Value = OnOff });
+			SendPilot(new { Cmd = "Esc", Value = OnOff });
 		}
 
 		private void ToggleButton_Bumper(object sender, RoutedEventArgs e)
 		{
 			Trace.WriteLine("::ToggleButton_Bumper");
 			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-            SerialSend(new { Cmd = "Bumper", Value = OnOff });
+            SendPilot(new { Cmd = "Bumper", Value = OnOff });
 		}
 
         private void slPower_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            SerialSend(new { Cmd = "Pwr", M1 = slPower.Value, M2 = slPower.Value });
+            SendPilot(new { Cmd = "Pwr", M1 = slPower.Value, M2 = slPower.Value });
         }
 
         private void SaveState_Click(object sender, RoutedEventArgs e)
@@ -365,12 +365,12 @@ namespace pilot_test
         private void Cali_Click(object sender, RoutedEventArgs e)
         {
             // this needs some testing!!
-            SerialSend(new { Cmd = "CALI", Vals = new int[] { -333, -3632,   2311, -1062,   28, -11 } });
+            SendPilot(new { Cmd = "CALI", Vals = new int[] { -333, -3632,   2311, -1062,   28, -11 } });
         }
 
         private void HdgRel_Click(object sender, RoutedEventArgs e)
         {
-            SerialSend(new { Cmd = "Rot", Rel = 45 });
+            SendPilot(new { Cmd = "Rot", Rel = 45 });
         }
     }
 }

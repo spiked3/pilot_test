@@ -19,7 +19,7 @@
                 <Style TargetType="Slider" >
                     <Setter Property="TickPlacement" Value="TopLeft" />
                     <Setter Property="IsSnapToTickEnabled" Value="True" />
-                    <Setter Property="MinWidth" Value="384" />
+                    <Setter Property="MinWidth" Value="240" />
                     <Setter Property="VerticalAlignment" Value="Center" />
                 </Style>
                 <Style TargetType="TextBox" >
