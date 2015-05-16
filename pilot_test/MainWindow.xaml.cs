@@ -73,9 +73,9 @@ namespace pilot_test
         byte[] recvbuf = new byte[1024];
 
 
-        private void Button_Serial(object sender, RoutedEventArgs e)
+        private void ToggleButton_Serial(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_Serial");
+            Trace.WriteLine("::ToggleButton_Serial");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
                 Serial = new SerialPort("com7", 115200);
