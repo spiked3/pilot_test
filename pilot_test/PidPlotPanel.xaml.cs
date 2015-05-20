@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace pilot_test
 {
     /// <summary>
-    /// Interaction logic for pidControl.xaml
+    /// Interaction logic for PidPlotPanel.xaml
     /// </summary>
-    public partial class pidControl : UserControl
+    public partial class PidPlotPanel : UserControl
     {
-        public pidControl()
+        public PidPlotPanel()
         {
             InitializeComponent();
         }

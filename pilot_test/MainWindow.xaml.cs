@@ -8,13 +8,44 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.Threading;
 using System.Dynamic;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Media;
+using System.Linq;
+using System.Reflection;
+using OxyPlot;
+using OxyPlot.Series;
+using OxyPlot.Axes;
 
 namespace pilot_test
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private SerialPort Serial;
-       public float Kp
+        static MainWindow _instance;
+
+        #region dp
+
+        public OxyPlot.PlotModel M1PlotModel
+        {
+            get { return (OxyPlot.PlotModel)GetValue(M1PlotModelProperty); }
+            set { SetValue(M1PlotModelProperty, value); }
+        }
+        public static readonly DependencyProperty M1PlotModelProperty =
+            DependencyProperty.Register("M1PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow), 
+                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder=OxyPlot.OxyColors.Black }));
+
+        public OxyPlot.PlotModel M2PlotModel
+        {
+            get { return (OxyPlot.PlotModel)GetValue(M2PlotModelProperty); }
+            set { SetValue(M2PlotModelProperty, value); }
+        }
+        public static readonly DependencyProperty M2PlotModelProperty =
+            DependencyProperty.Register("M2PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow), 
+                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder=OxyPlot.OxyColors.Black }));
+
+        public float Kp
         {
             get { return (float)GetValue(KpProperty); }
             set { SetValue(KpProperty, value); }
@@ -67,167 +98,22 @@ namespace pilot_test
         public static readonly DependencyProperty MotorMaxProperty =
             DependencyProperty.Register("MotorMax", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMax));
 
-        #region SerialCrap
-
-        int recvIdx = 0;
-        byte[] recvbuf = new byte[1024];
-
-
-        private void ToggleButton_Serial(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::ToggleButton_Serial");
-            if ((sender as ToggleButton).IsChecked ?? false)
-            {
-                Serial = new SerialPort("com7", 115200);
-                try
-                {
-                    Serial.Open();
-                    Serial.WriteTimeout = 200;
-                    SerialHandler(Serial);
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.Message);
-                }
-                SerialIsOpen = Serial.IsOpen;
-            }
-            else
-            {
-                if (Serial != null && Serial.IsOpen)
-                {
-                    Serial.Close();
-                    SerialIsOpen = Serial.IsOpen;
-                }
-            }
-        }
-
-        void ProcessLine(string line)
-        {
-            // comments ok, echo'd
-            if (line.StartsWith("//"))
-            {
-                Trace.WriteLine("com->" + line);
-                return;
-            }
-
-            if (line.Length < 3)
-            {
-                Trace.WriteLine(string.Format("{0} framing error", Serial.PortName), "warn");
-                // attempt to recover
-                bool recovered = false;
-                while (!recovered)
-                {
-                    DoEvents();
-                    try
-                    {
-                        Serial.ReadTo("\n");
-                        recovered = true;
-                    }
-                    catch (Exception)
-                    { }
-                }
-                return;
-            }
-            else
-            {
-                Trace.WriteLine("com->" + line);
-                string type = "";
-                try
-                {
-                    dynamic j = JsonConvert.DeserializeObject(line);
-                    type = (string)j["T"];
-                }
-                catch (JsonException je)
-                {
-                    System.Diagnostics.Trace.WriteLine(je.Message);
-                }
-                switch (type)
-                {
-                    case "Log":
-                        break;
-                    case "???":
-                        break;
-                }
-            }
-        }
-
-        void AppSerialDataEvent(byte[] received)
-        {
-            foreach (var b in received)
-            {
-                if (b == '\r')
-                    continue;
-                else if (b == '\n')
-                {
-                    recvbuf[recvIdx] = 0;
-                    string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx); // makes a copy
-                    Dispatcher.InvokeAsync(() => { ProcessLine(line); });
-                    recvIdx = 0;
-                    continue;
-                }
-                else
-                    recvbuf[recvIdx] = (byte)b;
-
-                recvIdx++;
-                if (recvIdx >= recvbuf.Length)
-                {
-                    System.Diagnostics.Debugger.Break();    // overflow
-                    // +++ atempt recovery
-                }
-            }
-        }
-
-        void SerialHandler(SerialPort port)
-        {
-            byte[] buffer = new byte[1024];
-            Action kickoffRead = null;
-            kickoffRead = delegate
-            {
-                port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate(IAsyncResult ar)
-                {
-                    if (port.IsOpen)
-                    {
-                        try
-                        {
-                            int actualLength = port.BaseStream.EndRead(ar);
-                            byte[] received = new byte[actualLength];
-                            Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
-                            AppSerialDataEvent(received);
-                        }
-                        catch (Exception exc)
-                        {
-                            Trace.WriteLine(exc.Message);
-                        }
-                        kickoffRead();
-                    }
-                }, null);
-                
-            };
-            kickoffRead();
-        }
-
-        void SerialSend(string t)
-        {
-            if (Serial != null && Serial.IsOpen)
-            {
-                Trace.WriteLine("com<-" + t);
-                Serial.WriteLine(t);
-                System.Threading.Thread.Sleep(200);  //  really needed :(
-                DoEvents();
-            }
-        }
-
-        void SendPilot(dynamic j)
-        {
-            if (Serial != null && Serial.IsOpen)
-                SerialSend(JsonConvert.SerializeObject(j));
-        }
-
         #endregion
+
+        public ObservableCollection<ButtonBase> CommandList { get { return _CommandList; } set { _CommandList = value; OnPropertyChanged(); } }
+        ObservableCollection<ButtonBase> _CommandList = new ObservableCollection<ButtonBase>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] String T = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(T));
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            _instance = this;
 
             Width = Settings.Default.Width;
             Height = Settings.Default.Height;
@@ -257,17 +143,59 @@ namespace pilot_test
             Settings.Default.Save();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            ButtonBase b;
             spiked3.Console.MessageLevel = 4;   // default
             Trace.WriteLine("Pilot v2 Test / QA", "+");
+
+            foreach (MemberInfo mi in GetType().GetMembers())
+            {
+                var attrs = mi.GetCustomAttributes(typeof(UiButton), true);
+                if (attrs.Length > 0)
+                {
+                    var attr = attrs[0] as UiButton;
+                    if (attr.isToggle)
+                        b = new ToggleButton { Content = attr.Name, Foreground = attr.Fg, Background = attr.Bg };
+                    else
+                        b = new Button { Content = attr.Name, Foreground = attr.Fg, Background = attr.Bg };
+                    RoutedEventHandler r = new RoutedEventHandler((s, e2) =>
+                    {
+                        GetType().InvokeMember(mi.Name, BindingFlags.InvokeMethod, null, this, new object[] { s, e2 });
+                    });
+                    b.Click += r;
+                    CommandList.Add(b);
+                }
+            }
+
+            // oxy
+            M1PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
+            M1PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
+            M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
+            M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
+            M2PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
+            M2PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
+            M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
+            M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (Serial != null && Serial.IsOpen)
                 Serial.Close();
+            if (Mq != null && Mq.IsConnected)
+                MqttClose();
             SaveVars();
+        }
+
+        void SaveState_Click(object sender, RoutedEventArgs e)
+        {
+            SaveVars();
+        }
+
+        void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         // yeah yeah, I know; everyone thinks do events is bad,
@@ -278,99 +206,150 @@ namespace pilot_test
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
         }
 
-        private void Test1_Click(object sender, RoutedEventArgs e)
+        // ---------------------- things
+
+        void ProcessLine(string line)
         {
-            Trace.WriteLine("::Button_Test1");
+            Trace.WriteLine("com->" + line.Trim(new char[] { '\r', '\n' }));
+            dynamic j = JsonConvert.DeserializeObject(line);
+            if (j["T"] == "Heartbeat")
+                Dispatcher.InvokeAsync(() => {
+                    HeartBeat(j);
+                });
         }
 
-        private void Power_Click(object sender, RoutedEventArgs e)
+        private void HeartBeat(dynamic j)
         {
-            tglEsc.IsChecked = true;
-            SendPilot(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
+            const int maxPoints = 200;
+
+            LineSeries m1t = M1PlotModel.Series[0] as LineSeries;
+            LineSeries m1v = M1PlotModel.Series[1] as LineSeries;
+            LineSeries m2t = M2PlotModel.Series[0] as LineSeries;
+            LineSeries m2v = M2PlotModel.Series[1] as LineSeries;
+
+            if (m1t.Points.Count > maxPoints) m1t.Points.RemoveAt(0);
+            if (m1v.Points.Count > maxPoints) m1v.Points.RemoveAt(0);
+            if (m2t.Points.Count > maxPoints) m2t.Points.RemoveAt(0);
+            if (m2v.Points.Count > maxPoints) m2v.Points.RemoveAt(0);
+
+            m1t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["T1"]));
+            m1v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["V1"]));
+            m2t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["T2"]));
+            m2v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["V2"]));
+
+            OxyM1.InvalidatePlot();
+            OxyM2.InvalidatePlot();            
         }
 
-        private void Pid_Click(object sender, RoutedEventArgs e)
+        // ---------------------- commands
+
+        [UiButton("Serial", "Black", "White", isToggle = true)]
+        public void ToggleButton_Serial(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::ToggleButton_Serial");
+            if ((sender as ToggleButton).IsChecked ?? false)
+                SerialOpen();
+            else
+                SerialClose();
+        }
+
+        [UiButton("MQTT", "Black", "White", isToggle = true)]
+        public void ToggleButton_MQTT(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::ToggleButton_MQTT");
+            if ((sender as ToggleButton).IsChecked ?? false)
+                MqttOpen();
+            else
+                MqttClose();
+        }
+
+        [UiButton("ESTOP", "White", "Red")]
+        public void EStop_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::EStop_Click");
+            SendPilot(new { Cmd = "Esc", Value = 0 });
+            SendPilot(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
+        }
+
+        [UiButton("Esc", "Black", "White", isToggle = true)]
+        public void ToggleButton_Esc(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::ToggleButton_Esc");
+            int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
+            SendPilot(new { Cmd = "Esc", Value = OnOff });
+        }
+
+        [UiButton("Reset", "Black", "Yellow")]
+        public void ResetPose_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Button_ResetPose");
+            SendPilot(new { Cmd = "Reset" });
+        }
+
+        [UiButton("PID")]
+        public void Pid_Click(object sender, RoutedEventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt)
             Trace.WriteLine("::Pid_Click");
             SendPilot(new { Cmd = "PID", Idx = 0, P = Kp, I = Ki, D = Kd });
         }
 
-        private void Geom_Click(object sender, RoutedEventArgs e)
+        [UiButton("Geom")]
+        public void Geom_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Geom_Click");
             SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 });
         }
 
-        private void HbOff_Click(object sender, RoutedEventArgs e)
+        [UiButton("Cali")]
+        public void Cali_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Cali_Click");
+            SendPilot(new { Cmd = "CALI", Vals = new int[] { -333, -3632, 2311, -1062, 28, -11 } });
+        }
+
+        [UiButton("Power")]
+        public void Power_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Power_Click");
+            SendPilot(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
+        }
+
+        [UiButton("HB Off")]
+        public void HbOff_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
             SendPilot(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
         }
 
-        private void Hb500_Click(object sender, RoutedEventArgs e)
+        [UiButton("HB 500")]
+        public void Hb500_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb500");
             SendPilot(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
         }
 
-        private void Hb2000_Click(object sender, RoutedEventArgs e)
+        [UiButton("HB 2000")]
+        public void Hb2000_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_Hb2000");
             SendPilot(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
         }
 
-        private void ResetPose_Click(object sender, RoutedEventArgs e)
+        [UiButton("Bumper", "Black", "White", isToggle = true)]
+        public void ToggleButton_Bumper(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_ResetPose");
-            SendPilot(new { Cmd = "Reset" });
-        }
-
-        private void EStop_Click(object sender, RoutedEventArgs e)
-        {
-            SendPilot(new { Cmd = "Esc", Value = 0 });
-            SendPilot(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-            tglEsc.IsChecked = false;
-        }
-
-		private void ToggleButton_Esc(object sender, RoutedEventArgs e)
-		{
-			Trace.WriteLine("::ToggleButton_Esc");
-			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-			SendPilot(new { Cmd = "Esc", Value = OnOff });
-		}
-
-		private void ToggleButton_Bumper(object sender, RoutedEventArgs e)
-		{
-			Trace.WriteLine("::ToggleButton_Bumper");
-			int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
+            Trace.WriteLine("::ToggleButton_Bumper");
+            int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
             SendPilot(new { Cmd = "Bumper", Value = OnOff });
-		}
-
-        private void slPower_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            SendPilot(new { Cmd = "Pwr", M1 = slPower.Value, M2 = slPower.Value });
         }
 
-        private void SaveState_Click(object sender, RoutedEventArgs e)
+        [UiButton("Rel Hdg")]
+        public void HdgRel_Click(object sender, RoutedEventArgs e)
         {
-            SaveVars();
-        }
-
-        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void Cali_Click(object sender, RoutedEventArgs e)
-        {
-            // this needs some testing!!
-            SendPilot(new { Cmd = "CALI", Vals = new int[] { -333, -3632,   2311, -1062,   28, -11 } });
-        }
-
-        private void HdgRel_Click(object sender, RoutedEventArgs e)
-        {
+            Trace.WriteLine("::HdgRel_Click");
             SendPilot(new { Cmd = "Rot", Rel = 45 });
         }
+
     }
 }
