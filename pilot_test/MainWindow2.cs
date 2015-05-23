@@ -58,7 +58,7 @@ namespace pilot_test
                     break;
 
                 default:
-                    Debugger.Break();
+                    //
                     break;
             }
         }

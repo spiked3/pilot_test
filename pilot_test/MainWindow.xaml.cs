@@ -180,15 +180,19 @@ namespace pilot_test
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
 
-            var t = new DispatcherTimer { Interval = new TimeSpan(0,0,0,0,100)};
-            t.Tick += GamePadTick;
-            t.Start();
+            Joy1.JoystickMovedListeners += GamepadHandler;
+
         }
 
-        private void GamePadTick(object sender, EventArgs e)
+        double lastJoyM1, lastJoyM2;
+        private void GamepadHandler(rChordata.DiamondPoint p)
         {
-            var c = GamePad.GetState(PlayerIndex.One);
-            //Trace.WriteLine(c.Buttons.Start == ButtonState.Pressed);
+            if (p.Left != lastJoyM1 || p.Right != lastJoyM2)
+            {
+                SendPilot(new { Cmd = "Pwr", M1 = p.Left * -100, M2 = p.Right * -100 });
+                lastJoyM1 = p.Left;
+                lastJoyM2 = p.Right;
+            }
         }
 
         void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

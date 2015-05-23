@@ -22,6 +22,10 @@
             </StackPanel>
         </StatusBar>
         <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="209*"/>
+                <ColumnDefinition Width="69*"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="132" />
                 <RowDefinition Height="3*" />
@@ -29,17 +33,7 @@
                 <RowDefinition Height="6*" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="1" >
-                <WrapPanel Grid.ColumnSpan="3" Grid.RowSpan="2" >
-                    <local:MotorPanel Margin="8" />
-                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                    <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320"/>
-                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                    <Oxy:PlotView x:Name="OxyM2" Model="{Binding M2PlotModel}" Width="320"/>
-                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                </WrapPanel>
-            </Grid>
-            <ListBox ItemsSource="{Binding CommandList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0">
+            <ListBox ItemsSource="{Binding CommandList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0"  >
                 <ListBox.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Width" Value="78" />
@@ -59,8 +53,31 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-            <spiked3:Console x:Name="console1" Grid.Row="3" VerticalAlignment="Stretch" />
+            
+            <spiked3:JoystickControl x:Name="Joy1" Width="120" Height="120" Margin="4" Grid.Column="1" Background="Ivory"/>
+            
+            <Grid Grid.Row="1" Grid.ColumnSpan="2" >
+                <TabControl  >
+                    <TabItem  Header="Motor">
+                        <StackPanel  Orientation="Horizontal">
+                            <local:MotorPanel Margin="8" />
+                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                            <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320"/>
+                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                            <Oxy:PlotView x:Name="OxyM2" Model="{Binding M2PlotModel}" Width="320"/>
+                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Other" >
+                        
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" />
+            
+            <spiked3:Console x:Name="console1" Grid.Row="3" VerticalAlignment="Stretch" Grid.ColumnSpan="2"  />
+
         </Grid>
     </DockPanel>
 </Window>

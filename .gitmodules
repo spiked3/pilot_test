@@ -1,3 +1,6 @@
 [submodule "plumbing"]
 	path = plumbing
 url=https://github.com/spiked3/Plumbing
+[submodule "XInputDotNet"]
+	path = XInputDotNet
+	url = https://github.com/speps/XInputDotNet.git

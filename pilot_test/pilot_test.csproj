@@ -76,16 +76,13 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="XInputDotNetPure, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\XInputDotNetPure.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="JoystickControl.cs" />
     <Compile Include="MainWindow2.cs" />
     <Compile Include="MotorPanel.xaml.cs">
       <DependentUpon>MotorPanel.xaml</DependentUpon>
@@ -155,6 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="plumbing\Clean.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XInputDotNet\XInputDotNetPure\XInputDotNetPure.csproj">
+      <Project>{952700cd-a384-43a4-ac4b-52256f83836e}</Project>
+      <Name>XInputDotNetPure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
