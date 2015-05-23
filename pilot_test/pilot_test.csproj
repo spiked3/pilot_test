@@ -76,6 +76,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="XInputDotNetPure, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\XInputDotNetPure.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -86,9 +90,6 @@
     <Compile Include="MotorPanel.xaml.cs">
       <DependentUpon>MotorPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PidPlotPanel.xaml.cs">
-      <DependentUpon>PidPlotPanel.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -96,10 +97,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Page Include="MotorPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PidPlotPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

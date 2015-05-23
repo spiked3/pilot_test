@@ -50,11 +50,15 @@ namespace pilot_test
                             if (type.Equals("Heartbeat"))
                                 Dispatcher.InvokeAsync(() => { HeartBeat(j); }, DispatcherPriority.Render);
                         }
+                        else
+                        {
+                            Trace.WriteLine(System.Text.Encoding.UTF8.GetString(e.Message).Trim(new char[] { '\n', '\r' }));
+                        }
                     }
                     break;
 
                 default:
-                    //System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
                     break;
             }
         }
@@ -111,8 +115,8 @@ namespace pilot_test
                 recvIdx++;
                 if (recvIdx >= recvbuf.Length)
                 {
-                    System.Diagnostics.Debugger.Break();    // overflow
                     // +++ atempt recovery
+                    System.Diagnostics.Debugger.Break();    // overflow
                 }
             }
         }
@@ -152,7 +156,6 @@ namespace pilot_test
             {
                 Trace.WriteLine("com<-" + t);
                 Serial.WriteLine(t);
-                //System.Threading.Thread.Sleep(200);  //  really needed :(
                 DoEvents();
             }
         }

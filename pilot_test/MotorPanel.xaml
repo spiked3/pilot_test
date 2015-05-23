@@ -47,15 +47,15 @@
 
         <Label Content="Proportion" Grid.Row="1" Grid.Column="0" />
         <TextBox Text="{Binding ElementName=slKp, Path=Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" />
-        <Slider x:Name="slKp" Minimum="0" Maximum="5" TickFrequency=".1" Value="{Binding Kp}" Grid.Row="1" Grid.Column="2" />
+        <Slider x:Name="slKp" Minimum="0" Maximum=".5" TickFrequency=".01" Value="{Binding Kp}" Grid.Row="1" Grid.Column="2" />
 
         <Label Content="Integral" Grid.Row="2" Grid.Column="0" />
         <TextBox Text="{Binding ElementName=slKi, Path=Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1" />
-        <Slider x:Name="slKi" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Ki}" Grid.Row="2" Grid.Column="2" />
+        <Slider x:Name="slKi" Minimum="0" Maximum="1" TickFrequency=".01" Value="{Binding Ki}" Grid.Row="2" Grid.Column="2" />
 
         <Label Content="Derivative" Grid.Row="3" Grid.Column="0" />
         <TextBox Text="{Binding ElementName=slKd, Path=Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="1" />
-        <Slider x:Name="slKd" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Kd}" Grid.Row="3" Grid.Column="2" />
+        <Slider x:Name="slKd" Minimum="0" Maximum="1" TickFrequency=".01" Value="{Binding Kd}" Grid.Row="3" Grid.Column="2" />
 
     </Grid>
 </UserControl>

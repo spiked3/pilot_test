@@ -19,6 +19,8 @@ using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 
+using XInputDotNetPure;
+
 namespace pilot_test
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
@@ -177,6 +179,16 @@ namespace pilot_test
             M2PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
+
+            var t = new DispatcherTimer { Interval = new TimeSpan(0,0,0,0,100)};
+            t.Tick += GamePadTick;
+            t.Start();
+        }
+
+        private void GamePadTick(object sender, EventArgs e)
+        {
+            var c = GamePad.GetState(PlayerIndex.One);
+            //Trace.WriteLine(c.Buttons.Start == ButtonState.Pressed);
         }
 
         void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -211,16 +223,29 @@ namespace pilot_test
         void ProcessLine(string line)
         {
             Trace.WriteLine("com->" + line.Trim(new char[] { '\r', '\n' }));
-            dynamic j = JsonConvert.DeserializeObject(line);
-            if (j["T"] == "Heartbeat")
-                Dispatcher.InvokeAsync(() => {
-                    HeartBeat(j);
-                });
+            try
+            {
+                dynamic j = JsonConvert.DeserializeObject(line);
+                if (j != null)
+                {
+                    if (j["T"] == "Heartbeat")
+                        Dispatcher.InvokeAsync(() =>
+                        {
+                            HeartBeat(j);
+                        });
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void HeartBeat(dynamic j)
         {
-            const int maxPoints = 200;
+#if false
+            return;
+#endif
+            const int maxPoints = 100;
 
             LineSeries m1t = M1PlotModel.Series[0] as LineSeries;
             LineSeries m1v = M1PlotModel.Series[1] as LineSeries;
@@ -351,5 +376,11 @@ namespace pilot_test
             SendPilot(new { Cmd = "Rot", Rel = 45 });
         }
 
+        [UiButton("Travel")]
+        public void Travel_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Travel_Click");
+            SendPilot(new { Cmd = "Travel", Dist = 2.0, Spd = 50.0 });
+        }
     }
 }
