@@ -189,7 +189,7 @@ namespace pilot_test
         {
             if (p.Left != lastJoyM1 || p.Right != lastJoyM2)
             {
-                SendPilot(new { Cmd = "Pwr", M1 = p.Left * -100, M2 = p.Right * -100 });
+                SendPilot(new { Cmd = "Pwr", M1 = p.Left, M2 = p.Right });
                 lastJoyM1 = p.Left;
                 lastJoyM2 = p.Right;
             }

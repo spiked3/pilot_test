@@ -72,17 +72,17 @@ namespace spiked3
 
         void TimerTick(object sender, EventArgs e)
         {
-            var c = GamePad.GetState(PlayerIndex.One);
+            //var c = GamePad.GetState(PlayerIndex.One);
             //Trace.WriteLine($"game x({c.ThumbSticks.Right.X}) y({c.ThumbSticks.Right.Y})");
-            var p = new DoublePoint(c.ThumbSticks.Right.X, -c.ThumbSticks.Right.Y);
+            //var p = new DoublePoint(c.ThumbSticks.Right.X, -c.ThumbSticks.Right.Y);
 
-            mouseDraggedLocation = new Point(
-                map(c.ThumbSticks.Right.X, -1, 1, 0, ActualWidth),
-                map(c.ThumbSticks.Right.Y, 1, -1, 0, ActualHeight));
+            //mouseDraggedLocation = new Point(
+            //    map(c.ThumbSticks.Right.X, -1, 1, 0, ActualWidth),
+            //    map(c.ThumbSticks.Right.Y, 1, -1, 0, ActualHeight));
 
-            DiamondPoint = DiamondToolbox.CartesianToDiamond(p, 1);
-            if (JoystickMovedListeners != null)
-                JoystickMovedListeners(DiamondPoint);
+            //DiamondPoint = DiamondToolbox.CartesianToDiamond(p, 1);
+            //if (JoystickMovedListeners != null)
+            //    JoystickMovedListeners(DiamondPoint);
 
             InvalidateVisual();
         }
