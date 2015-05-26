@@ -37,10 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeviceManagement, Version=0.1.0.0, Culture=neutral, PublicKeyToken=fd6496bcaffe247a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DeviceManagementPackage.0.1.0\lib\net40\DeviceManagement.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="M2Mqtt, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\M2Mqtt.4.1\lib\net45\M2Mqtt.dll</HintPath>
       <Private>True</Private>
@@ -76,6 +72,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="XInputDotNetPure">
+      <HintPath>D:\Source\3rdPartyCode\XInputDotNet\XInputDotNetPure\obj\x64\Debug\XInputDotNetPure.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -152,12 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="plumbing\Clean.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\XInputDotNet\XInputDotNetPure\XInputDotNetPure.csproj">
-      <Project>{952700cd-a384-43a4-ac4b-52256f83836e}</Project>
-      <Name>XInputDotNetPure</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

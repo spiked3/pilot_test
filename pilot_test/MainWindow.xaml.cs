@@ -19,12 +19,11 @@ using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 
-using XInputDotNetPure;
-
 namespace pilot_test
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        
         static MainWindow _instance;
 
         #region dp
@@ -47,27 +46,6 @@ namespace pilot_test
             DependencyProperty.Register("M2PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow), 
                 new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder=OxyPlot.OxyColors.Black }));
 
-        public float Kp
-        {
-            get { return (float)GetValue(KpProperty); }
-            set { SetValue(KpProperty, value); }
-        }
-        public static readonly DependencyProperty KpProperty =
-            DependencyProperty.Register("Kp", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kp));
-        public float Ki
-        {
-            get { return (float)GetValue(KiProperty); }
-            set { SetValue(KiProperty, value); }
-        }
-        public static readonly DependencyProperty KiProperty =
-            DependencyProperty.Register("Ki", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Ki));
-        public float Kd
-        {
-            get { return (float)GetValue(KdProperty); }
-            set { SetValue(KdProperty, value); }
-        }
-        public static readonly DependencyProperty KdProperty =
-            DependencyProperty.Register("Kd", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kd));
         public bool? SerialIsOpen
         {
             get { return Serial != null && Serial.IsOpen; }
@@ -75,22 +53,6 @@ namespace pilot_test
         }
         public static readonly DependencyProperty SerialIsOpenProperty =
             DependencyProperty.Register("SerialIsOpen", typeof(bool?), typeof(MainWindow), new PropertyMetadata(false));
-
-        public float MotorPower
-        {
-            get { return (float)GetValue(MotorPowerProperty); }
-            set { SetValue(MotorPowerProperty, value); }
-        }
-        public static readonly DependencyProperty MotorPowerProperty =
-            DependencyProperty.Register("MotorPower", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorPower));
-
-        public float MotorMin
-        {
-            get { return (float)GetValue(MotorMinProperty); }
-            set { SetValue(MotorMinProperty, value); }
-        }
-        public static readonly DependencyProperty MotorMinProperty =
-            DependencyProperty.Register("MotorMin", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMin));
 
         public float MotorMax
         {
@@ -116,6 +78,7 @@ namespace pilot_test
         {
             InitializeComponent();
             _instance = this;
+            motorPanel1.MotorPower = 0;
 
             Width = Settings.Default.Width;
             Height = Settings.Default.Height;
@@ -137,11 +100,9 @@ namespace pilot_test
             Settings.Default.Left = (float)Left;
 
             Settings.Default.MotorMax = MotorMax;
-            Settings.Default.MotorMin = MotorMin;
-            Settings.Default.MotorPower = MotorPower;
-            Settings.Default.Kp = Kp;
-            Settings.Default.Ki = Ki;
-            Settings.Default.Kd = Kd;
+            Settings.Default.Kp = motorPanel1.Kp;
+            Settings.Default.Ki = motorPanel1.Ki;
+            Settings.Default.Kd = motorPanel1.Kd;
             Settings.Default.Save();
         }
 
@@ -180,11 +141,11 @@ namespace pilot_test
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
 
-            Joy1.JoystickMovedListeners += GamepadHandler;
-
+           Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
         double lastJoyM1, lastJoyM2;
+
         private void GamepadHandler(rChordata.DiamondPoint p)
         {
             if (p.Left != lastJoyM1 || p.Right != lastJoyM2)
@@ -320,7 +281,7 @@ namespace pilot_test
         {
             // critical you include the decimal point (json decoding rqmt)
             Trace.WriteLine("::Pid_Click");
-            SendPilot(new { Cmd = "PID", Idx = 0, P = Kp, I = Ki, D = Kd });
+            SendPilot(new { Cmd = "PID", Idx = 0, P = motorPanel1.Kp, I = motorPanel1.Ki, D = motorPanel1.Kd });
         }
 
         [UiButton("Geom")]
@@ -341,7 +302,7 @@ namespace pilot_test
         public void Power_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Power_Click");
-            SendPilot(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
+            SendPilot(new { Cmd = "Pwr", M1 = motorPanel1.MotorPower, M2 = motorPanel1.MotorPower });
         }
 
         [UiButton("HB Off")]

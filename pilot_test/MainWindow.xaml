@@ -4,7 +4,7 @@
         xmlns:spiked3="clr-namespace:spiked3"
         xmlns:local="clr-namespace:pilot_test" x:Class="pilot_test.MainWindow"
         xmlns:Oxy="http://oxyplot.org/wpf"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" 
         Title="Spiked3.com Pilot V1R1 Tests" Height="640" Width="850" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner"
         >
     <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
@@ -60,7 +60,7 @@
                 <TabControl  >
                     <TabItem  Header="Motor">
                         <StackPanel  Orientation="Horizontal">
-                            <local:MotorPanel Margin="8" />
+                            <local:MotorPanel x:Name="motorPanel1" Margin="8" />
                             <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
                             <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320"/>
                             <Separator Style="{StaticResource VerticalSeparatorStyle}"/>

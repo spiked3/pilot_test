@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pilot_test", "pilot_test\pilot_test.csproj", "{924EA84E-515E-499B-B929-2643A3019FBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XInputDotNetPure", "XInputDotNet\XInputDotNetPure\XInputDotNetPure.csproj", "{952700CD-A384-43A4-AC4B-52256F83836E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,16 +27,6 @@ Global
 		{924EA84E-515E-499B-B929-2643A3019FBB}.Release|x64.Build.0 = Release|Any CPU
 		{924EA84E-515E-499B-B929-2643A3019FBB}.Release|x86.ActiveCfg = Release|Any CPU
 		{924EA84E-515E-499B-B929-2643A3019FBB}.Release|x86.Build.0 = Release|Any CPU
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Debug|x64.ActiveCfg = Debug|x64
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Debug|x64.Build.0 = Debug|x64
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Debug|x86.ActiveCfg = Debug|x86
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Debug|x86.Build.0 = Debug|x86
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Release|Any CPU.ActiveCfg = Release|x86
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Release|x64.ActiveCfg = Release|x64
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Release|x64.Build.0 = Release|x64
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Release|x86.ActiveCfg = Release|x86
-		{952700CD-A384-43A4-AC4B-52256F83836E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
