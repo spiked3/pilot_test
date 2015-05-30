@@ -136,12 +136,14 @@ namespace pilot_test
             M1PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
             M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
             M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
+            M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Pwr" });
             M2PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
             M2PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
+            M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Pwr" });
 
-           Joy1.JoystickMovedListeners += GamepadHandler;
+            Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
         double lastJoyM1, lastJoyM2;
@@ -212,20 +214,27 @@ namespace pilot_test
 #endif
             const int maxPoints = 100;
 
+            DateTime nowTime = DateTime.Now;
             LineSeries m1t = M1PlotModel.Series[0] as LineSeries;
             LineSeries m1v = M1PlotModel.Series[1] as LineSeries;
+            LineSeries m1p = M1PlotModel.Series[2] as LineSeries;
             LineSeries m2t = M2PlotModel.Series[0] as LineSeries;
             LineSeries m2v = M2PlotModel.Series[1] as LineSeries;
+            LineSeries m2p = M2PlotModel.Series[2] as LineSeries;
 
             if (m1t.Points.Count > maxPoints) m1t.Points.RemoveAt(0);
             if (m1v.Points.Count > maxPoints) m1v.Points.RemoveAt(0);
+            if (m1p.Points.Count > maxPoints) m1p.Points.RemoveAt(0);
             if (m2t.Points.Count > maxPoints) m2t.Points.RemoveAt(0);
             if (m2v.Points.Count > maxPoints) m2v.Points.RemoveAt(0);
+            if (m2p.Points.Count > maxPoints) m2p.Points.RemoveAt(0);
 
-            m1t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["T1"]));
-            m1v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["V1"]));
-            m2t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["T2"]));
-            m2v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)j["V2"]));
+            m1t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["T1"]));
+            m1v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["V1"]));
+            m1p.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["P1"]));
+            m2t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["T2"]));
+            m2v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["V2"]));
+            m2p.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["P2"]));
 
             OxyM1.InvalidatePlot();
             OxyM2.InvalidatePlot();            
@@ -290,7 +299,7 @@ namespace pilot_test
             Trace.WriteLine("::Geom_Click");
             // old: SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 } });
             // new: ticks per meter, motormax ticks per second 
-            SendPilot(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  450.0F } });
+            SendPilot(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  500F } });
         }
 
         [UiButton("Cali")]
