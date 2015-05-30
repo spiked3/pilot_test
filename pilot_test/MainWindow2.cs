@@ -56,7 +56,6 @@ namespace pilot_test
                         }
                     }
                     break;
-
                 default:
                     //
                     break;

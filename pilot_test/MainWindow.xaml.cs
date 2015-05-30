@@ -345,18 +345,18 @@ namespace pilot_test
             SendPilot(new { Cmd = "Bumper", Value = OnOff });
         }
 
-        [UiButton("Rel Hdg")]
-        public void HdgRel_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::HdgRel_Click");
-            SendPilot(new { Cmd = "Rot", Rel = 45 });
-        }
+        //[UiButton("Rel Hdg")]
+        //public void HdgRel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Trace.WriteLine("::HdgRel_Click");
+        //    SendPilot(new { Cmd = "Rot", Rel = 45 });
+        //}
 
-        [UiButton("Travel")]
-        public void Travel_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Travel_Click");
-            SendPilot(new { Cmd = "Travel", Dist = 2.0, Spd = 50.0 });
-        }
+        //[UiButton("Travel")]
+        //public void Travel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Trace.WriteLine("::Travel_Click");
+        //    SendPilot(new { Cmd = "Travel", Dist = 2.0, Spd = 50.0 });
+        //}
     }
 }
