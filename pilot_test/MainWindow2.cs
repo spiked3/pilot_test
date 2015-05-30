@@ -17,8 +17,8 @@ namespace pilot_test
 {
     public partial class MainWindow : Window
     {
-        //string broker = "127.0.0.1";
-        string broker = "192.168.1.30";      // pi
+        string broker = "127.0.0.1";
+        //string broker = "192.168.1.30";      // pi
 
         MqttClient Mq;
         private SerialPort Serial;

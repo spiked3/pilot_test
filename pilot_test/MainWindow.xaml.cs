@@ -281,21 +281,23 @@ namespace pilot_test
         {
             // critical you include the decimal point (json decoding rqmt)
             Trace.WriteLine("::Pid_Click");
-            SendPilot(new { Cmd = "PID", Idx = 0, P = motorPanel1.Kp, I = motorPanel1.Ki, D = motorPanel1.Kd });
+            SendPilot(new { Cmd = "Config", PID = new float[] { motorPanel1.Kp, motorPanel1.Ki, motorPanel1.Kd }});
         }
 
         [UiButton("Geom")]
         public void Geom_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Geom_Click");
-            SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 });
+            // old: SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 } });
+            // new: ticks per meter, motormax ticks per second 
+            SendPilot(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  450.0F } });
         }
 
         [UiButton("Cali")]
         public void Cali_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Cali_Click");
-            SendPilot(new { Cmd = "CALI", Vals = new int[] { -333, -3632, 2311, -1062, 28, -11 } });
+            SendPilot(new { Cmd = "Config" , MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
         }
 
         [UiButton("Power")]
