@@ -17,8 +17,8 @@ namespace pilot_test
 {
     public partial class MainWindow : Window
     {
-        string broker = "127.0.0.1";
-        //string broker = "192.168.1.30";      // pi
+        //string broker = "127.0.0.1";
+        string broker = "192.168.1.30";      // pi
 
         MqttClient Mq;
         private SerialPort Serial;
@@ -33,7 +33,7 @@ namespace pilot_test
             Mq = new MqttClient(broker);
             Mq.MqttMsgPublishReceived += MqttMsgPublishReceived;
             Mq.Connect("PC");
-            Trace.WriteLine($"Connected to MQTT @{broker}","1");
+            Trace.WriteLine($"Connected to MQTT @ {broker}","1");
             Mq.Subscribe(new string[] { "robot1/#" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
         }
 
