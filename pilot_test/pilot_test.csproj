@@ -82,6 +82,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="JoystickControl.cs" />
+    <Compile Include="MainWindow3.cs" />
     <Compile Include="MainWindow2.cs" />
     <Compile Include="MotorPanel.xaml.cs">
       <DependentUpon>MotorPanel.xaml</DependentUpon>

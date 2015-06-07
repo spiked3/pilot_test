@@ -28,6 +28,38 @@ namespace pilot_test
 
         #region dp
 
+        public float Adjustment
+        {
+            get { return (float)GetValue(AdjustmentProperty); }
+            set { SetValue(AdjustmentProperty, value); }
+        }
+        public static readonly DependencyProperty AdjustmentProperty =
+            DependencyProperty.Register("Adjustment", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
+
+        public float X
+        {
+            get { return (float)GetValue(XProperty); }
+            set { SetValue(XProperty, value); }
+        }
+        public static readonly DependencyProperty XProperty =
+            DependencyProperty.Register("X", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
+
+        public float Y
+        {
+            get { return (float)GetValue(YProperty); }
+            set { SetValue(YProperty, value); }
+        }
+        public static readonly DependencyProperty YProperty =
+            DependencyProperty.Register("Y", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
+
+        public float H
+        {
+            get { return (float)GetValue(HProperty); }
+            set { SetValue(HProperty, value); }
+        }
+        public static readonly DependencyProperty HProperty =
+            DependencyProperty.Register("H", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
+
         public OxyPlot.PlotModel M1PlotModel
         {
             get { return (OxyPlot.PlotModel)GetValue(M1PlotModelProperty); }
@@ -195,11 +227,11 @@ namespace pilot_test
                 dynamic j = JsonConvert.DeserializeObject(line);
                 if (j != null)
                 {
-                    if (j["T"] == "Heartbeat")
-                        Dispatcher.InvokeAsync(() =>
-                        {
-                            HeartBeat(j);
-                        });
+                    string type = j["T"];
+                    if (type.Equals("Heartbeat"))
+                        Dispatcher.InvokeAsync(() => { HeartBeat(j); });
+                    if (type.Equals("Pose"))
+                        Dispatcher.InvokeAsync(() => { ReceivePose(j); });
                 }
             }
             catch (Exception)

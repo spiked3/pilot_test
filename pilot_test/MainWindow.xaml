@@ -53,9 +53,9 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            
+
             <spiked3:JoystickControl x:Name="Joy1" Width="120" Height="120" Margin="4" Grid.Column="1" Background="Ivory"/>
-            
+
             <Grid Grid.Row="1" Grid.ColumnSpan="2" >
                 <TabControl  >
                     <TabItem  Header="Motor">
@@ -69,7 +69,25 @@
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Other" >
-                        
+                        <StackPanel Orientation="Vertical" >
+                            <StackPanel.Resources >
+                                <Style TargetType="Label" >
+                                    <Setter Property="Margin" Value="4,0" />
+                                    <Setter Property="Width" Value="72" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <Label Content="Adjust" />
+                        <Slider Value="{Binding Adjustment}" Minimum="-20" Maximum="20" />
+                            <StackPanel Orientation="Horizontal" >
+                                <Label Content="X" />
+                                <Label Content="{Binding X}" />
+                                <Label Content="Y" />
+                                <Label Content="{Binding Y}" />
+                                <Label Content="H" />
+                                <Label Content="{Binding H}" />
+                            </StackPanel>
+                        </StackPanel>
+
                     </TabItem>
                 </TabControl>
             </Grid>

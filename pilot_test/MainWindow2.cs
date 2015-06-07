@@ -49,6 +49,8 @@ namespace pilot_test
                             string type = (string)j["T"];
                             if (type.Equals("Heartbeat"))
                                 Dispatcher.InvokeAsync(() => { HeartBeat(j); }, DispatcherPriority.Render);
+                            if (type.Equals("Pose"))
+                                Dispatcher.InvokeAsync(() => { ReceivePose(j); }, DispatcherPriority.Render);
                         }
                         else
                         {
@@ -60,6 +62,13 @@ namespace pilot_test
                     //
                     break;
             }
+        }
+
+        private void ReceivePose(dynamic j)
+        {
+            X = j.X;
+            Y = j.Y;
+            H = j.H;
         }
 
         void MqttClose()
@@ -80,7 +89,7 @@ namespace pilot_test
 
         private void SerialOpen()
         {
-            Serial = new SerialPort("com7", 115200);
+            Serial = new SerialPort("com11", 115200);
             try
             {
                 Serial.Open();
