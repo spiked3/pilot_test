@@ -72,9 +72,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="XInputDotNetPure">
-      <HintPath>D:\Source\3rdPartyCode\XInputDotNet\XInputDotNetPure\obj\x64\Debug\XInputDotNetPure.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -82,8 +79,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="JoystickControl.cs" />
-    <Compile Include="MainWindow3.cs" />
-    <Compile Include="MainWindow2.cs" />
+    <Compile Include="Pilot.cs" />
     <Compile Include="MotorPanel.xaml.cs">
       <DependentUpon>MotorPanel.xaml</DependentUpon>
     </Compile>

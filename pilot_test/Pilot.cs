@@ -15,25 +15,53 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace pilot_test
 {
-    public partial class MainWindow : Window
+    public class Pilot
     {
-        //string broker = "127.0.0.1";
-        string broker = "192.168.1.30";      // pi
-
         MqttClient Mq;
         private SerialPort Serial;
 
         int recvIdx = 0;
         byte[] recvbuf = new byte[1024];
 
-// ----------------------------------------
+        public string CommStatus { get; internal set; }
 
-        void MqttOpen()
+        public delegate void ReceiveHandler(dynamic json);
+        public event ReceiveHandler OnReceive;
+
+        public static Pilot Factory(string uri)     // not really a uri, yet
         {
-            Mq = new MqttClient(broker);
+            // +++ ideally verify serial port is a pilot
+            // if serial opens fail, try local and remote mqtt (in that order)
+
+            Pilot p = new Pilot();
+            
+            //string broker = "127.0.0.1";
+            //string broker = "192.168.1.30";      // pi
+
+            if (uri.Contains("com"))
+                p.SerialOpen(uri);
+            else
+                p.MqttOpen(uri);
+
+            StringBuilder b = new StringBuilder();
+            if (p.Serial != null && p.Serial.IsOpen)
+                b.Append($"{p.Serial.PortName} open");
+            if (p.Mq != null && p.Mq.IsConnected)
+                b.Append($"Mqtt ({uri}) connected");
+            p.CommStatus = b.ToString();
+
+            return p;
+        }
+
+        private Pilot()
+        { }
+
+        void MqttOpen(string c)
+        {
+            Mq = new MqttClient(c);
             Mq.MqttMsgPublishReceived += MqttMsgPublishReceived;
             Mq.Connect("PC");
-            Trace.WriteLine($"Connected to MQTT @ {broker}","1");
+            Trace.WriteLine($"Connected to MQTT @ {c}", "1");
             Mq.Subscribe(new string[] { "robot1/#" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
         }
 
@@ -42,54 +70,33 @@ namespace pilot_test
             switch (e.Topic)
             {
                 case "robot1":
-                    {
-                        dynamic j = JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message));
-                        if (j != null)
-                        {
-                            string type = (string)j["T"];
-                            if (type.Equals("Heartbeat"))
-                                Dispatcher.InvokeAsync(() => { HeartBeat(j); }, DispatcherPriority.Render);
-                            if (type.Equals("Pose"))
-                                Dispatcher.InvokeAsync(() => { ReceivePose(j); }, DispatcherPriority.Render);
-                        }
-                        else
-                        {
-                            Trace.WriteLine(System.Text.Encoding.UTF8.GetString(e.Message).Trim(new char[] { '\n', '\r' }));
-                        }
-                    }
-                    break;
-                default:
-                    //
+                    string j = System.Text.Encoding.UTF8.GetString(e.Message);
+                    if (j.StartsWith("//!"))
+                        Trace.WriteLine(j.Trim() + "\r\n","error");
+                    else if (j.StartsWith("/"))
+                        Trace.WriteLine(j.Trim() + "\r\n","1");
+                    else if (OnReceive != null)
+                            OnReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
                     break;
             }
-        }
-
-        private void ReceivePose(dynamic j)
-        {
-            X = j.X;
-            Y = j.Y;
-            H = j.H;
         }
 
         void MqttClose()
         {
             Mq.Disconnect();
-            Trace.WriteLine("MQTT disconnected","2");
+            Trace.WriteLine("MQTT disconnected", "2");
         }
 
         private void SerialClose()
         {
-                if (Serial != null && Serial.IsOpen)
-                {
-                    Serial.Close();
-                    SerialIsOpen = Serial.IsOpen;
-                }
+            if (Serial != null && Serial.IsOpen)
+                Serial.Close();
             Trace.WriteLine("Serial closed");
         }
 
-        private void SerialOpen()
+        private void SerialOpen(string c)
         {
-            Serial = new SerialPort("com11", 115200);
+            Serial = new SerialPort(c, 115200);
             try
             {
                 Serial.Open();
@@ -100,10 +107,8 @@ namespace pilot_test
             {
                 Trace.WriteLine(ex.Message);
             }
-            SerialIsOpen = Serial.IsOpen;
-            Trace.WriteLine($"Serial opened={Serial.IsOpen} on {Serial.PortName}","2");
+            Trace.WriteLine($"Serial opened={Serial.IsOpen} on {Serial.PortName}", "2");
         }
-
 
         void AppSerialDataEvent(byte[] received)
         {
@@ -113,7 +118,9 @@ namespace pilot_test
                 {
                     recvbuf[recvIdx] = 0;
                     string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx); // makes a copy
-                    Dispatcher.InvokeAsync(() => { ProcessLine(line); });
+                    Trace.WriteLine("com->" + line.Trim(new char[] { '\r', '\n' }));
+                    if (OnReceive != null)
+                        OnReceive(JsonConvert.DeserializeObject(line));
                     recvIdx = 0;
                     continue;
                 }
@@ -164,34 +171,25 @@ namespace pilot_test
             {
                 Trace.WriteLine("com<-" + t);
                 Serial.WriteLine(t);
-                DoEvents();
+                //Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doevents
             }
         }
 
-        public static void SendPilot(dynamic j)
+        public void Send(dynamic j)
         {
             string jsn = JsonConvert.SerializeObject(j);
-            if (_instance?.Serial?.IsOpen ?? false)
-                _instance?.SerialSend(jsn);
-            if (_instance?.Mq?.IsConnected ?? false)
-                _instance?.Mq.Publish("robot1/Cmd", UTF8Encoding.ASCII.GetBytes(jsn));
+            if (Serial?.IsOpen ?? false)
+               SerialSend(jsn);
+            if (Mq?.IsConnected ?? false)
+                Mq.Publish("robot1/Cmd", UTF8Encoding.ASCII.GetBytes(jsn));
         }
-    }
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public class UiButton : Attribute
-    {
-        public Brush Bg;
-        public Brush Fg;
-        public string Name;
-        public bool isToggle;
-
-        public UiButton(string name, string Foreground = "Black", string Background = "LightGray", bool isToggle = false)
+        internal void Close()
         {
-            Name = name;
-            Fg = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Foreground));
-            Bg = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Background));
+            if (Serial != null && Serial.IsOpen)
+                Serial.Close();
+            if (Mq != null && Mq.IsConnected)
+                MqttClose();
         }
     }
-
 }

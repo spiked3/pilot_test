@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:pilot_test" x:Class="pilot_test.MainWindow"
         xmlns:Oxy="http://oxyplot.org/wpf"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" 
-        Title="Spiked3.com Pilot V1R1 Tests" Height="640" Width="850" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner"
+        Title="Spiked3.com Pilot V0 R6.8 Tests" Height="640" Width="850" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner"
         >
     <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
         <Menu DockPanel.Dock="Top" >
@@ -17,10 +17,19 @@
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <StackPanel Orientation="Horizontal" >
-                <Label Content="Serial Open: "  Margin="4,0,4,0"/>
-                <TextBlock Text="{Binding SerialIsOpen, FallbackValue=NA}" VerticalAlignment="Center" Margin="4,0,4,0"/>
+                <Label Content="Comm Status:"  Margin="4,0,4,0"/>
+                <TextBlock Text="{Binding CommStatus, FallbackValue=None}" VerticalAlignment="Center" Margin="4,0"/>
+                <StackPanel Orientation="Horizontal"  Margin="8,0">
+                    <Label Content="X:" />
+                    <TextBlock Text="{Binding X}" Width="72" />
+                    <Label Content="Y:" />
+                    <TextBlock Text="{Binding Y}" Width="72" />
+                    <Label Content="H:" />
+                    <TextBlock Text="{Binding H}" Width="36" />
+                </StackPanel>
             </StackPanel>
         </StatusBar>
+
         <Grid >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="209*"/>
@@ -54,46 +63,49 @@
                 </ListBox.ItemsPanel>
             </ListBox>
 
-            <spiked3:JoystickControl x:Name="Joy1" Width="120" Height="120" Margin="4" Grid.Column="1" Background="Ivory"/>
+            <spiked3:JoystickControl x:Name="Joy1" Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
 
-            <Grid Grid.Row="1" Grid.ColumnSpan="2" >
-                <TabControl  >
-                    <TabItem  Header="Motor">
-                        <StackPanel  Orientation="Horizontal">
-                            <local:MotorPanel x:Name="motorPanel1" Margin="8" />
-                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                            <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320"/>
-                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                            <Oxy:PlotView x:Name="OxyM2" Model="{Binding M2PlotModel}" Width="320"/>
-                            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem Header="Other" >
+
+            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.ColumnSpan="2">
+                <Grid Grid.Row="1" Grid.ColumnSpan="1" >
+                    <StackPanel  Orientation="Horizontal">
                         <StackPanel Orientation="Vertical" >
-                            <StackPanel.Resources >
-                                <Style TargetType="Label" >
-                                    <Setter Property="Margin" Value="4,0" />
-                                    <Setter Property="Width" Value="72" />
-                                </Style>
-                            </StackPanel.Resources>
-                            <Label Content="Adjust" />
-                        <Slider Value="{Binding Adjustment}" Minimum="-20" Maximum="20" />
-                            <StackPanel Orientation="Horizontal" >
-                                <Label Content="X" />
-                                <Label Content="{Binding X}" />
-                                <Label Content="Y" />
-                                <Label Content="{Binding Y}" />
-                                <Label Content="H" />
-                                <Label Content="{Binding H}" />
+                            <StackPanel Orientation="Horizontal" Margin="4" >
+                                <Label Content="Pwr" />
+                                <TextBox Text="{Binding MotorPower,UpdateSourceTrigger=PropertyChanged,Delay=500}" />
+                                <Button Content="Send" Width="42" Margin="4,0" Click="Power_Click" Foreground="White" Background="DarkGray"/>
+                                <Label Content="Caution: Automatic send on change" Margin="8,0" Width="220"/>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="4" >
+                                <Label Content="TurnH" />
+                                <TextBox Text="{Binding TurnH}" />
+                                <Label Content="TurnPwr" />
+                                <TextBox Text="{Binding TurnPwr}" />
+                                <Button Content="Send" Width="42" Margin="4,0" Click="Turn_Click" Foreground="White" Background="DarkGray"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="4" >
+                                <Label Content="MoveD" />
+                                <TextBox Text="{Binding MoveD}" />
+                                <Label Content="MovePwr" />
+                                <TextBox Text="{Binding MovePwr}" />
+                                <Button Content="Send" Width="42" Margin="4,0" Foreground="White" Background="DarkGray"/>
+                            </StackPanel>
+
+                            <local:MotorPanel x:Name="motorPanel1" Margin="8" />
                         </StackPanel>
 
-                    </TabItem>
-                </TabControl>
-            </Grid>
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320" Margin="4,2" />
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        <Oxy:PlotView x:Name="OxyM2" Model="{Binding M2PlotModel}" Width="320" Margin="4,2" />
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
 
-            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" />
-            
+            <GridSplitter Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" />
+
             <spiked3:Console x:Name="console1" Grid.Row="3" VerticalAlignment="Stretch" Grid.ColumnSpan="2"  />
 
         </Grid>

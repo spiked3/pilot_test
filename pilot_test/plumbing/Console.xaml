@@ -12,26 +12,28 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal"  >
-            <Grid Width="128" Margin="4">
+        <StackPanel Orientation="Horizontal" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" >
+            <Grid Margin="4">
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="9*" />
-                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding MessageLevel}" Grid.Row="0" Grid.Column="1" Margin="4" />
-                <TextBlock Text="Message Level" Grid.Row="0" Grid.Column="0" Margin="4" />
+                <TextBlock Text="{Binding MessageLevel}" Grid.Row="0" Grid.Column="1" />
+                <Label Content="Message Level" Width="124" Grid.Row="0" Grid.Column="0" Style="{x:Null}"/>
                 <Slider Minimum="0" Maximum="5" TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True" Value="{Binding MessageLevel,Mode=TwoWay}" ValueChanged="Slider_ValueChanged" Grid.Row="1" Grid.ColumnSpan="2" />
+                <Button Background="Transparent" Click="Clear_Click" HorizontalAlignment="Right" Padding="2" Grid.Column="2" Grid.RowSpan="2" Margin="4,0">
+                    <StackPanel Orientation="Vertical" >
+                        <Image Source="Clean.png" />
+                        <TextBlock Text="Clear" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </Grid>
-            <Button Margin="4" Background="Transparent" Click="Clear_Click" >
-                <StackPanel Orientation="Vertical" >
-                    <Image Source="Clean.png" />
-                    <TextBlock Text="Clear"  HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
+
         </StackPanel>
 
         <ListBox x:Name="consoleListBox" Background="Black" Foreground="White" Grid.Row="1" VerticalAlignment="Stretch" />
