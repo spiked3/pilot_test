@@ -94,11 +94,15 @@
 
                             <local:MotorPanel x:Name="motorPanel1" Margin="8" />
                         </StackPanel>
-
                         <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
                         <Oxy:PlotView x:Name="OxyM1" Model="{Binding M1PlotModel}" Width="320" Margin="4,2" />
                         <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
                         <Oxy:PlotView x:Name="OxyM2" Model="{Binding M2PlotModel}" Width="320" Margin="4,2" />
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        <Oxy:PlotView x:Name="OxyM3" Model="{Binding M3PlotModel}" Width="320" Margin="4,2" />
+                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                        <Oxy:PlotView x:Name="OxyM4" Model="{Binding M4PlotModel}" Width="320" Margin="4,2" />
                         <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
                     </StackPanel>
                 </Grid>

@@ -107,8 +107,26 @@ namespace pilot_test
             set { SetValue(M2PlotModelProperty, value); }
         }
         public static readonly DependencyProperty M2PlotModelProperty =
-            DependencyProperty.Register("M2PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow), 
-                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder=OxyPlot.OxyColors.Black }));
+            DependencyProperty.Register("M2PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
+                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
+
+        public OxyPlot.PlotModel M3PlotModel
+        {
+            get { return (OxyPlot.PlotModel)GetValue(M3PlotModelProperty); }
+            set { SetValue(M3PlotModelProperty, value); }
+        }
+        public static readonly DependencyProperty M3PlotModelProperty =
+            DependencyProperty.Register("M3PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
+                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
+
+        public OxyPlot.PlotModel M4PlotModel
+        {
+            get { return (OxyPlot.PlotModel)GetValue(M4PlotModelProperty); }
+            set { SetValue(M4PlotModelProperty, value); }
+        }
+        public static readonly DependencyProperty M4PlotModelProperty =
+            DependencyProperty.Register("M4PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
+                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
 
         public float MotorMax
         {
@@ -226,6 +244,13 @@ namespace pilot_test
             M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
             //M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Pwr" });
 
+            M3PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
+            M3PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
+            M3PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Fb" });
+            M4PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
+            M4PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
+            M4PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Fb" });
+
             Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
@@ -289,35 +314,35 @@ namespace pilot_test
         }
         private void ReceivedHeartBeat(dynamic j)
         {
-#if false
-            return;
-#endif
+            //return;
+            var t = DateTimeAxis.ToDouble(DateTime.Now);
             const int maxPoints = 100;
 
-            DateTime nowTime = DateTime.Now;
             LineSeries m1t = M1PlotModel.Series[0] as LineSeries;
             LineSeries m1v = M1PlotModel.Series[1] as LineSeries;
             //LineSeries m1p = M1PlotModel.Series[2] as LineSeries;
             LineSeries m2t = M2PlotModel.Series[0] as LineSeries;
             LineSeries m2v = M2PlotModel.Series[1] as LineSeries;
             //LineSeries m2p = M2PlotModel.Series[2] as LineSeries;
+            LineSeries fb1 = M3PlotModel.Series[0] as LineSeries;
+            LineSeries fb2 = M4PlotModel.Series[0] as LineSeries;
 
-            if (m1t.Points.Count > maxPoints) m1t.Points.RemoveAt(0);
-            if (m1v.Points.Count > maxPoints) m1v.Points.RemoveAt(0);
-            //if (m1p.Points.Count > maxPoints) m1p.Points.RemoveAt(0);
-            if (m2t.Points.Count > maxPoints) m2t.Points.RemoveAt(0);
-            if (m2v.Points.Count > maxPoints) m2v.Points.RemoveAt(0);
-            //if (m2p.Points.Count > maxPoints) m2p.Points.RemoveAt(0);
+            foreach (LineSeries l in new [] {m1t, m1v, m2t, m2v, fb1, fb2 })
+                if (l.Points.Count > maxPoints) l.Points.RemoveAt(0);
 
-            m1t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["T1"]));
-            m1v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["V1"]));
-            //m1p.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["P1"]));
-            m2t.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["T2"]));
-            m2v.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["V2"]));
-            //m2p.Points.Add(new DataPoint(DateTimeAxis.ToDouble(nowTime), (double)j["P2"]));
+            m1t.Points.Add(new DataPoint(t, (double)j["T1"]));
+            m1v.Points.Add(new DataPoint(t, (double)j["V1"]));
+            //m1p.Points.Add(new DataPoint(t, (double)j["P1"]));
+            m2t.Points.Add(new DataPoint(t, (double)j["T2"]));
+            m2v.Points.Add(new DataPoint(t, (double)j["V2"]));
+            //m2p.Points.Add(new DataPoint(t, (double)j["P2"]));
+            fb1.Points.Add(new DataPoint(t, (int)j["F1"]));
+            fb2.Points.Add(new DataPoint(t, (int)j["F2"]));
 
             OxyM1.InvalidatePlot();
-            OxyM2.InvalidatePlot();            
+            OxyM2.InvalidatePlot();
+            OxyM3.InvalidatePlot();
+            OxyM4.InvalidatePlot();
         }
 
         // ---------------------- commands
@@ -339,7 +364,8 @@ namespace pilot_test
             if (Pilot != null)
                 Pilot.OnReceive -= Pilot_OnReceive;
             Trace.WriteLine("::ToggleButton_MQTT");
-            Pilot = Pilot.Factory("192.168.1.30");
+            //Pilot = Pilot.Factory("192.168.1.30");
+            Pilot = Pilot.Factory("127.0.0.1");
             Pilot.OnReceive += Pilot_OnReceive;
             CommStatus = Pilot.CommStatus;
         }
@@ -383,7 +409,7 @@ namespace pilot_test
             Trace.WriteLine("::Geom_Click");
             // old: SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 } });
             // new: ticks per meter, motormax ticks per second 
-            Pilot.Send(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  500F } });
+            Pilot.Send(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  450F } });
         }
 
         [UiButton("Cali")]
