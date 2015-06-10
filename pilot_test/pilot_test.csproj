@@ -83,6 +83,7 @@
     <Compile Include="MotorPanel.xaml.cs">
       <DependentUpon>MotorPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OxyPilot.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Settings.Designer.cs">
       <AutoGen>True</AutoGen>

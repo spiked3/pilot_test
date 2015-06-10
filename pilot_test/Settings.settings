@@ -2,25 +2,22 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="pilot_test" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Width" Type="System.Single" Scope="User">
+    <Setting Name="Width" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Height" Type="System.Single" Scope="User">
+    <Setting Name="Height" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Top" Type="System.Single" Scope="User">
+    <Setting Name="Top" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Left" Type="System.Single" Scope="User">
+    <Setting Name="Left" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MotorMax" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">100</Value>
-    </Setting>
-    <Setting Name="MotorMin" Type="System.Single" Scope="User">
+    <Setting Name="MotorMin" Type="System.Double" Scope="User">
       <Value Profile="(Default)">-100</Value>
     </Setting>
-    <Setting Name="MotorPower" Type="System.Single" Scope="User">
+    <Setting Name="MotorPower" Type="System.Double" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="Kp" Type="System.Single" Scope="User">
@@ -31,6 +28,9 @@
     </Setting>
     <Setting Name="Kd" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.01</Value>
+    </Setting>
+    <Setting Name="Split1" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">200</Value>
     </Setting>
   </Settings>
 </SettingsFile>

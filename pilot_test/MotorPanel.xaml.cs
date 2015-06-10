@@ -26,5 +26,10 @@ namespace pilot_test
         {
             InitializeComponent();            
         }
+
+        private void Send_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow._theInstance.Pid_Click(sender, e);
+        }
     }
 }

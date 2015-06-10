@@ -21,7 +21,7 @@ namespace pilot_test
         private SerialPort Serial;
 
         int recvIdx = 0;
-        byte[] recvbuf = new byte[1024];
+        byte[] recvbuf = new byte[4096];
 
         public string CommStatus { get; internal set; }
 
@@ -31,12 +31,8 @@ namespace pilot_test
         public static Pilot Factory(string uri)     // not really a uri, yet
         {
             // +++ ideally verify serial port is a pilot
-            // if serial opens fail, try local and remote mqtt (in that order)
 
             Pilot p = new Pilot();
-            
-            //string broker = "127.0.0.1";
-            //string broker = "192.168.1.30";      // pi
 
             if (uri.Contains("com"))
                 p.SerialOpen(uri);
@@ -72,11 +68,11 @@ namespace pilot_test
                 case "robot1":
                     string j = System.Text.Encoding.UTF8.GetString(e.Message);
                     if (j.StartsWith("//!"))
-                        Trace.WriteLine(j.Trim() + "\r\n","error");
+                        Trace.WriteLine(j.Trim() + "\r\n", "error");
                     else if (j.StartsWith("/"))
-                        Trace.WriteLine(j.Trim() + "\r\n","1");
+                        Trace.WriteLine(j.Trim() + "\r\n", "+");
                     else if (OnReceive != null)
-                            OnReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
+                        OnReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
                     break;
             }
         }
@@ -84,14 +80,14 @@ namespace pilot_test
         void MqttClose()
         {
             Mq.Disconnect();
-            Trace.WriteLine("MQTT disconnected", "2");
+            Trace.WriteLine("MQTT disconnected", "3");
         }
 
         private void SerialClose()
         {
             if (Serial != null && Serial.IsOpen)
                 Serial.Close();
-            Trace.WriteLine("Serial closed");
+            Trace.WriteLine("Serial closed", "3");
         }
 
         private void SerialOpen(string c)
@@ -100,14 +96,14 @@ namespace pilot_test
             try
             {
                 Serial.Open();
-                Serial.WriteTimeout = 200;
+                Serial.WriteTimeout = 50;
                 SerialHandler(Serial);
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.Message);
             }
-            Trace.WriteLine($"Serial opened={Serial.IsOpen} on {Serial.PortName}", "2");
+            Trace.WriteLine($"Serial opened({Serial.IsOpen}) on {Serial.PortName}", "2");
         }
 
         void AppSerialDataEvent(byte[] received)
@@ -125,14 +121,10 @@ namespace pilot_test
                     continue;
                 }
                 else
-                    recvbuf[recvIdx] = (byte)b;
+                    recvbuf[recvIdx++] = (byte)b;
 
-                recvIdx++;
                 if (recvIdx >= recvbuf.Length)
-                {
-                    // +++ atempt recovery
-                    System.Diagnostics.Debugger.Break();    // overflow
-                }
+                    System.Diagnostics.Debugger.Break();    // overflow +++ atempt recovery
             }
         }
 
@@ -144,7 +136,7 @@ namespace pilot_test
             {
                 port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
                 {
-                    if (port.IsOpen)
+                    if (port?.IsOpen ?? false)
                     {
                         try
                         {
@@ -157,21 +149,21 @@ namespace pilot_test
                         {
                             Trace.WriteLine(exc.Message);
                         }
-                        kickoffRead();
+                        if (port?.IsOpen ?? false)
+                            kickoffRead();  // re-trigger
                     }
                 }, null);
-
             };
+
             kickoffRead();
         }
 
         void SerialSend(string t)
         {
-            if (Serial != null && Serial.IsOpen)
+            if (Serial?.IsOpen ?? false)
             {
                 Trace.WriteLine("com<-" + t);
                 Serial.WriteLine(t);
-                //Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doevents
             }
         }
 
@@ -179,16 +171,16 @@ namespace pilot_test
         {
             string jsn = JsonConvert.SerializeObject(j);
             if (Serial?.IsOpen ?? false)
-               SerialSend(jsn);
+                SerialSend(jsn);
             if (Mq?.IsConnected ?? false)
                 Mq.Publish("robot1/Cmd", UTF8Encoding.ASCII.GetBytes(jsn));
         }
 
         internal void Close()
         {
-            if (Serial != null && Serial.IsOpen)
+            if (Serial?.IsOpen ?? false)
                 Serial.Close();
-            if (Mq != null && Mq.IsConnected)
+            if (Mq?.IsConnected ?? false)
                 MqttClose();
         }
     }

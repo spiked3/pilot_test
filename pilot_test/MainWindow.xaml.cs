@@ -21,12 +21,12 @@ using OxyPlot.Axes;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
+// DoEvents:  Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
+
 namespace pilot_test
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        static MainWindow _theInstance;
-
         #region dp
 
         public string CommStatus
@@ -59,15 +59,6 @@ namespace pilot_test
         public static readonly DependencyProperty KdProperty =
             DependencyProperty.Register("Kd", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kd));
 
-
-        public float Adjustment
-        {
-            get { return (float)GetValue(AdjustmentProperty); }
-            set { SetValue(AdjustmentProperty, value); }
-        }
-        public static readonly DependencyProperty AdjustmentProperty =
-            DependencyProperty.Register("Adjustment", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
-
         public float X
         {
             get { return (float)GetValue(XProperty); }
@@ -92,49 +83,15 @@ namespace pilot_test
         public static readonly DependencyProperty HProperty =
             DependencyProperty.Register("H", typeof(float), typeof(MainWindow), new PropertyMetadata(0F));
 
-        public OxyPlot.PlotModel M1PlotModel
+        public OxyPilot oxy1Model
         {
-            get { return (OxyPlot.PlotModel)GetValue(M1PlotModelProperty); }
-            set { SetValue(M1PlotModelProperty, value); }
+            get { return (OxyPilot)GetValue(oxy1ModelProperty); }
+            set { SetValue(oxy1ModelProperty, value); }
         }
-        public static readonly DependencyProperty M1PlotModelProperty =
-            DependencyProperty.Register("M1PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow), 
-                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder=OxyPlot.OxyColors.Black }));
-
-        public OxyPlot.PlotModel M2PlotModel
-        {
-            get { return (OxyPlot.PlotModel)GetValue(M2PlotModelProperty); }
-            set { SetValue(M2PlotModelProperty, value); }
-        }
-        public static readonly DependencyProperty M2PlotModelProperty =
-            DependencyProperty.Register("M2PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
-                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
-
-        public OxyPlot.PlotModel M3PlotModel
-        {
-            get { return (OxyPlot.PlotModel)GetValue(M3PlotModelProperty); }
-            set { SetValue(M3PlotModelProperty, value); }
-        }
-        public static readonly DependencyProperty M3PlotModelProperty =
-            DependencyProperty.Register("M3PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
-                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
-
-        public OxyPlot.PlotModel M4PlotModel
-        {
-            get { return (OxyPlot.PlotModel)GetValue(M4PlotModelProperty); }
-            set { SetValue(M4PlotModelProperty, value); }
-        }
-        public static readonly DependencyProperty M4PlotModelProperty =
-            DependencyProperty.Register("M4PlotModel", typeof(OxyPlot.PlotModel), typeof(MainWindow),
-                new PropertyMetadata(new OxyPlot.PlotModel { LegendBorder = OxyPlot.OxyColors.Black }));
-
-        public float MotorMax
-        {
-            get { return (float)GetValue(MotorMaxProperty); }
-            set { SetValue(MotorMaxProperty, value); }
-        }
-        public static readonly DependencyProperty MotorMaxProperty =
-            DependencyProperty.Register("MotorMax", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.MotorMax));
+        public static readonly DependencyProperty oxy1ModelProperty =
+            DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow), 
+                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1","PW1", "F1" })
+                    { LegendBorder = OxyColors.Black }));
 
         public float TurnH
         {
@@ -154,14 +111,12 @@ namespace pilot_test
 
         #endregion
 
+        public static MainWindow _theInstance;
         Pilot Pilot;
-
-        float Kp_steer = 1f, Ki_steer = 0f, Kd_steer = 0f;
-
+        
         const float travelThreshold = 0.1F;
         const float turnThreshold = 10F;
         const float turnBase = 20F;
-        bool cancelFlag;
 
         public ObservableCollection<ButtonBase> CommandList { get { return _CommandList; } set { _CommandList = value; OnPropertyChanged(); } }
         ObservableCollection<ButtonBase> _CommandList = new ObservableCollection<ButtonBase>();
@@ -183,6 +138,7 @@ namespace pilot_test
             Height = Settings.Default.Height;
             Top = Settings.Default.Top;
             Left = Settings.Default.Left;
+            mainGrid.RowDefinitions[1].Height = new GridLength(Settings.Default.Split1);
 
             if (Width == 0 || Height == 0)
             {
@@ -193,15 +149,16 @@ namespace pilot_test
 
         void SaveVars()
         {
-            Settings.Default.Width = (float)Width;
-            Settings.Default.Height = (float)Height;
-            Settings.Default.Top = (float)Top;
-            Settings.Default.Left = (float)Left;
+            Settings.Default.Width = Width;
+            Settings.Default.Height = Height;
+            Settings.Default.Top = Top;
+            Settings.Default.Left = Left;
+            Settings.Default.Split1 = mainGrid.RowDefinitions[1].Height.Value;
 
-            Settings.Default.MotorMax = MotorMax;
             Settings.Default.Kp = Kp;
             Settings.Default.Ki = Ki;
             Settings.Default.Kd = Kd;
+
             Settings.Default.Save();
         }
 
@@ -232,25 +189,6 @@ namespace pilot_test
                 }
             }
 
-            // oxy
-            M1PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
-            M1PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
-            M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
-            //M1PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Pwr" });
-            M2PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
-            M2PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Tgt" });
-            M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Vel" });
-            //M2PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Pwr" });
-
-            M3PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
-            M3PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            M3PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Fb" });
-            M4PlotModel.Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
-            M4PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            M4PlotModel.Series.Add(new OxyPlot.Series.LineSeries { Title = "Fb" });
-
             Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
@@ -259,13 +197,13 @@ namespace pilot_test
             switch ((string)(json["T"]))
             {
                 case "Heartbeat":
-                    Dispatcher.InvokeAsync(() => { ReceivedHeartBeat(json); }, DispatcherPriority.Render);
+                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); });
                     break;
                 case "Pose":
-                    Dispatcher.InvokeAsync(() => { ReceivedPose(json); }, DispatcherPriority.Render);
+                    Dispatcher.InvokeAsync(() => { ReceivedPose(json); });
                     break;
                 case "Moved":
-                    Dispatcher.InvokeAsync(() => { ReceivedMoved(json); }, DispatcherPriority.Render);
+                    Dispatcher.InvokeAsync(() => { ReceivedMoved(json); });
                     break;
             }
         }
@@ -305,69 +243,41 @@ namespace pilot_test
             Close();
         }
 
-        // yeah yeah, I know; everyone thinks do events is bad,
-        // but this is test software not production. we generate a lot of UI traffic in our click handler we want to see
-        // without resorting to threads
-        void DoEvents()
-        {
-            Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
-        }
-        private void ReceivedHeartBeat(dynamic j)
-        {
-            //return;
-            var t = DateTimeAxis.ToDouble(DateTime.Now);
-            const int maxPoints = 100;
-
-            LineSeries m1t = M1PlotModel.Series[0] as LineSeries;
-            LineSeries m1v = M1PlotModel.Series[1] as LineSeries;
-            //LineSeries m1p = M1PlotModel.Series[2] as LineSeries;
-            LineSeries m2t = M2PlotModel.Series[0] as LineSeries;
-            LineSeries m2v = M2PlotModel.Series[1] as LineSeries;
-            //LineSeries m2p = M2PlotModel.Series[2] as LineSeries;
-            LineSeries fb1 = M3PlotModel.Series[0] as LineSeries;
-            LineSeries fb2 = M4PlotModel.Series[0] as LineSeries;
-
-            foreach (LineSeries l in new [] {m1t, m1v, m2t, m2v, fb1, fb2 })
-                if (l.Points.Count > maxPoints) l.Points.RemoveAt(0);
-
-            m1t.Points.Add(new DataPoint(t, (double)j["T1"]));
-            m1v.Points.Add(new DataPoint(t, (double)j["V1"]));
-            //m1p.Points.Add(new DataPoint(t, (double)j["P1"]));
-            m2t.Points.Add(new DataPoint(t, (double)j["T2"]));
-            m2v.Points.Add(new DataPoint(t, (double)j["V2"]));
-            //m2p.Points.Add(new DataPoint(t, (double)j["P2"]));
-            fb1.Points.Add(new DataPoint(t, (int)j["F1"]));
-            fb2.Points.Add(new DataPoint(t, (int)j["F2"]));
-
-            OxyM1.InvalidatePlot();
-            OxyM2.InvalidatePlot();
-            OxyM3.InvalidatePlot();
-            OxyM4.InvalidatePlot();
-        }
-
         // ---------------------- commands
 
-        [UiButton("Serial", "Black", "White")]
+        [UiButton("Serial", "Black", "White", isToggle = true)]
         public void ToggleButton_Serial(object sender, RoutedEventArgs e)
         {
-            if (Pilot != null)
-                Pilot.OnReceive -= Pilot_OnReceive;
             Trace.WriteLine("::ToggleButton_Serial");
-            Pilot = Pilot.Factory("com7");
-            Pilot.OnReceive += Pilot_OnReceive;
-            CommStatus = Pilot.CommStatus;
+            if ((sender as ToggleButton).IsChecked ?? false)
+            {
+                Pilot = Pilot.Factory("com7");
+                Pilot.OnReceive += Pilot_OnReceive;
+                CommStatus = Pilot.CommStatus;
+            }
+            else if (Pilot != null)
+            {
+                Pilot.OnReceive -= Pilot_OnReceive;
+                Pilot.Close();
+            }
         }
 
-        [UiButton("MQTT", "Black", "White")]
+        [UiButton("MQTT", "Black", "White", isToggle =true)]
         public void ToggleButton_MQTT(object sender, RoutedEventArgs e)
         {
-            if (Pilot != null)
-                Pilot.OnReceive -= Pilot_OnReceive;
             Trace.WriteLine("::ToggleButton_MQTT");
-            //Pilot = Pilot.Factory("192.168.1.30");
-            Pilot = Pilot.Factory("127.0.0.1");
-            Pilot.OnReceive += Pilot_OnReceive;
-            CommStatus = Pilot.CommStatus;
+            if ((sender as ToggleButton).IsChecked ?? false)
+            {
+                //Pilot = Pilot.Factory("192.168.1.30");
+                Pilot = Pilot.Factory("127.0.0.1");
+                Pilot.OnReceive += Pilot_OnReceive;
+                CommStatus = Pilot.CommStatus;
+            }
+            else if (Pilot != null)
+            {
+                Pilot.OnReceive -= Pilot_OnReceive;
+                Pilot.Close();
+            }
         }
 
         [UiButton("ESTOP", "White", "Red")]
@@ -394,7 +304,6 @@ namespace pilot_test
             X = Y = H = 0f;
         }
 
-        [UiButton("PID")]
         public void Pid_Click(object sender, RoutedEventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt) (use data type float)
@@ -407,7 +316,6 @@ namespace pilot_test
         {
             // +++  I can NOT resolve the measured value with actual reality :(
             Trace.WriteLine("::Geom_Click");
-            // old: SendPilot(new { Cmd = "Geom", TPR = 60, Diam = 175.0F, Base = 220.0F, mMax = 450 } });
             // new: ticks per meter, motormax ticks per second 
             Pilot.Send(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  450F } });
         }
@@ -432,17 +340,17 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
         }
 
-        [UiButton("HB 500")]
-        public void Hb500_Click(object sender, RoutedEventArgs e)
+        [UiButton("HB fast")]
+        public void HbFast_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_Hb500");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
+            Trace.WriteLine("::HbFast_Click");
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000 });
         }
 
-        [UiButton("HB 2000")]
-        public void Hb2000_Click(object sender, RoutedEventArgs e)
+        [UiButton("HB slow")]
+        public void HbSlow_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_Hb2000");
+            Trace.WriteLine("::HbSlow_Click");
             Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
         }
 
@@ -475,80 +383,38 @@ namespace pilot_test
             _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "Pwr", M1 = p, M2 = p }); } );
         }
 
-        [UiButton("Cancel Move", "White", "Red")]
-        public void Cancel(object sender, RoutedEventArgs e)
-        {
-            cancelFlag = true;
-        }
-
         [UiButton("Straight 1M", "White", "Magenta")]
         public void Straight_1M(object sender, RoutedEventArgs e)
         {
-            float distGoal = 1F;
-            Trace.WriteLine("::Straight_1M");
-            float startX = X, startY = Y, startH = H;
+            //float distGoal = 1F;
+            //Trace.WriteLine("::Straight_1M");
+            //float startX = X, startY = Y, startH = H;
 
-            DateTime lastTime = DateTime.Now;
-            previousIntegral = previousDerivative = previousError = 0F;
+            //DateTime lastTime = DateTime.Now;
+            //previousIntegral = previousDerivative = previousError = 0F;
 
-            for (cancelFlag = false; !cancelFlag;)
-            {
-                DateTime nowTime = DateTime.Now;
-                TimeSpan elapsed = nowTime - lastTime;
-                float min = distGoal - travelThreshold,
-                    dist = Math.Abs(distance(startX, X, startY, Y));
-                bool arrived = dist >= min;
-                if (arrived)
-                {
-                    Trace.WriteLine($" Arrive");
-                    Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-                    break;
-                }
+            //for (cancelFlag = false; !cancelFlag;)
+            //{
+            //    DateTime nowTime = DateTime.Now;
+            //    TimeSpan elapsed = nowTime - lastTime;
+            //    float min = distGoal - travelThreshold,
+            //        dist = Math.Abs(distance(startX, X, startY, Y));
+            //    bool arrived = dist >= min;
+            //    if (arrived)
+            //    {
+            //        Trace.WriteLine($" Arrive");
+            //        Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
+            //        break;
+            //    }
 
-                Adjustment = constrain(Adjustment, -10, 10);
-                Trace.WriteLine($" Adjust {Adjustment} M1({40 - Adjustment}) M1({40 + Adjustment})");
-                Pilot.Send(new { Cmd = "Pwr", M1 = 40.0 - Adjustment, M2 = 40.0 + Adjustment });
-                DoEvents();
-                System.Threading.Thread.Sleep(100);
-                DoEvents();
-                lastTime = nowTime;
-            }
-        }
-
-
-        [UiButton("Back 1M", "White", "Magenta")]
-        public void Back_1M(object sender, RoutedEventArgs e)
-        {
-            float distGoal = 1F;
-            Trace.WriteLine("::Back_1M");
-            float startX = X, startY = Y, startH = H;
-
-            DateTime lastTime = DateTime.Now;
-            previousIntegral = previousDerivative = previousError = 0F;
-
-            for (cancelFlag = false; !cancelFlag;)
-            {
-                DateTime nowTime = DateTime.Now;
-                TimeSpan elapsed = nowTime - lastTime;
-                float min = distGoal - travelThreshold,
-                    dist = Math.Abs(distance(startX, X, startY, Y));
-                bool arrived = dist >= min;
-                if (arrived)
-                {
-                    Trace.WriteLine($" Arrive");
-                    Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-                    break;
-                }
-
-                Adjustment = -simplePid(startH - H, Kp_steer, Ki_steer, Kd_steer, elapsed);
-                Adjustment = constrain(Adjustment, -10, 10);
-                Trace.WriteLine($" Adjust {Adjustment} M1({-40 - Adjustment}) M1({-40 + Adjustment})");
-                Pilot.Send(new { Cmd = "Pwr", M1 = -40.0 - Adjustment, M2 = -40.0 + Adjustment });
-                DoEvents();
-                System.Threading.Thread.Sleep(100);
-                DoEvents();
-                lastTime = nowTime;
-            }
+            //    Adjustment = constrain(Adjustment, -10, 10);
+            //    Trace.WriteLine($" Adjust {Adjustment} M1({40 - Adjustment}) M1({40 + Adjustment})");
+            //    Pilot.Send(new { Cmd = "Pwr", M1 = 40.0 - Adjustment, M2 = 40.0 + Adjustment });
+            //    DoEvents();
+            //    System.Threading.Thread.Sleep(100);
+            //    DoEvents();
+            //    lastTime = nowTime;
+            //}
         }
 
         private void ReceivedMoved(dynamic j)
@@ -557,9 +423,9 @@ namespace pilot_test
             Trace.WriteLine($"ReceivedMoved ({v})");
         }
 
-        private float constrain(float adjust, int v1, int v2)
+        private float constrain(float v, int mi, int ma)
         {
-            return Math.Max(Math.Min(v2, adjust), v1);
+            return Math.Max(Math.Min(ma, v), mi);
         }
 
         static float distance(float startX, float x, float startY, float y)

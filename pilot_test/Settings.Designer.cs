@@ -12,7 +12,7 @@ namespace pilot_test {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -26,9 +26,9 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public float Width {
+        public double Width {
             get {
-                return ((float)(this["Width"]));
+                return ((double)(this["Width"]));
             }
             set {
                 this["Width"] = value;
@@ -38,9 +38,9 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public float Height {
+        public double Height {
             get {
-                return ((float)(this["Height"]));
+                return ((double)(this["Height"]));
             }
             set {
                 this["Height"] = value;
@@ -50,9 +50,9 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public float Top {
+        public double Top {
             get {
-                return ((float)(this["Top"]));
+                return ((double)(this["Top"]));
             }
             set {
                 this["Top"] = value;
@@ -62,9 +62,9 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public float Left {
+        public double Left {
             get {
-                return ((float)(this["Left"]));
+                return ((double)(this["Left"]));
             }
             set {
                 this["Left"] = value;
@@ -73,22 +73,10 @@ namespace pilot_test {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public float MotorMax {
-            get {
-                return ((float)(this["MotorMax"]));
-            }
-            set {
-                this["MotorMax"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-100")]
-        public float MotorMin {
+        public double MotorMin {
             get {
-                return ((float)(this["MotorMin"]));
+                return ((double)(this["MotorMin"]));
             }
             set {
                 this["MotorMin"] = value;
@@ -98,9 +86,9 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50")]
-        public float MotorPower {
+        public double MotorPower {
             get {
-                return ((float)(this["MotorPower"]));
+                return ((double)(this["MotorPower"]));
             }
             set {
                 this["MotorPower"] = value;
@@ -140,6 +128,18 @@ namespace pilot_test {
             }
             set {
                 this["Kd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public double Split1 {
+            get {
+                return ((double)(this["Split1"]));
+            }
+            set {
+                this["Split1"] = value;
             }
         }
     }
