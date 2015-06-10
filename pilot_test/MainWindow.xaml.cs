@@ -90,7 +90,7 @@ namespace pilot_test
         }
         public static readonly DependencyProperty oxy1ModelProperty =
             DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow), 
-                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1","PW1", "F1" })
+                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1" })
                     { LegendBorder = OxyColors.Black }));
 
         public float TurnH

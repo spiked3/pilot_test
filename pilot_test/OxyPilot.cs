@@ -27,7 +27,7 @@ namespace pilot_test
 
             foreach (LineSeries ls in Series)
             { 
-                if (ls.Points.Count > pointLimit)
+                while (ls.Points.Count > pointLimit)
                     ls.Points.RemoveAt(0);
                 try
                 {
