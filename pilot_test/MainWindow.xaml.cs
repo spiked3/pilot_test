@@ -90,7 +90,7 @@ namespace pilot_test
         }
         public static readonly DependencyProperty oxy1ModelProperty =
             DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow), 
-                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1" })
+                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1", "PW1", "F1" })
                     { LegendBorder = OxyColors.Black }));
 
         public float TurnH
@@ -268,8 +268,8 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_MQTT");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                //Pilot = Pilot.Factory("192.168.1.30");
-                Pilot = Pilot.Factory("127.0.0.1");
+                Pilot = Pilot.Factory("192.168.1.30");
+                //Pilot = Pilot.Factory("127.0.0.1");
                 Pilot.OnReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
@@ -344,7 +344,7 @@ namespace pilot_test
         public void HbFast_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbFast_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000 });
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 100 });
         }
 
         [UiButton("HB slow")]
@@ -391,10 +391,7 @@ namespace pilot_test
             //float startX = X, startY = Y, startH = H;
 
             //DateTime lastTime = DateTime.Now;
-            //previousIntegral = previousDerivative = previousError = 0F;
 
-            //for (cancelFlag = false; !cancelFlag;)
-            //{
             //    DateTime nowTime = DateTime.Now;
             //    TimeSpan elapsed = nowTime - lastTime;
             //    float min = distGoal - travelThreshold,
@@ -404,17 +401,12 @@ namespace pilot_test
             //    {
             //        Trace.WriteLine($" Arrive");
             //        Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-            //        break;
+            //        return;
             //    }
 
-            //    Adjustment = constrain(Adjustment, -10, 10);
-            //    Trace.WriteLine($" Adjust {Adjustment} M1({40 - Adjustment}) M1({40 + Adjustment})");
-            //    Pilot.Send(new { Cmd = "Pwr", M1 = 40.0 - Adjustment, M2 = 40.0 + Adjustment });
-            //    DoEvents();
-            //    System.Threading.Thread.Sleep(100);
-            //    DoEvents();
-            //    lastTime = nowTime;
-            //}
+            //    //Adjustment = constrain(Adjustment, -10, 10);
+            //    //Trace.WriteLine($" Adjust {Adjustment} M1({40 - Adjustment}) M1({40 + Adjustment})");
+            //    Pilot.Send(new { Cmd = "Pwr", M1 = 40.0 , M2 = 40.0});
         }
 
         private void ReceivedMoved(dynamic j)
