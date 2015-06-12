@@ -89,9 +89,9 @@ namespace pilot_test
             set { SetValue(oxy1ModelProperty, value); }
         }
         public static readonly DependencyProperty oxy1ModelProperty =
-            DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow), 
-                new PropertyMetadata(new OxyPilot(new[] { "T1","V1", "I1", "D1", "PW1", "F1" })
-                    { LegendBorder = OxyColors.Black }));
+            DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow),                
+                new PropertyMetadata(new OxyPilot(new[] { "T1", "V1", "I1", "D1", "PW1", "F1" })
+                { LegendBorder = OxyColors.Black }));
 
         public float TurnH
         {
@@ -192,6 +192,11 @@ namespace pilot_test
             Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
+        //protected override void OnContentRendered(EventArgs e)
+        //{
+        //    //base.OnContentRendered(e);
+        //}
+
         private void Pilot_OnReceive(dynamic json)
         {
             switch ((string)(json["T"]))
@@ -252,12 +257,12 @@ namespace pilot_test
             if ((sender as ToggleButton).IsChecked ?? false)
             {
                 Pilot = Pilot.Factory("com7");
-                Pilot.OnReceive += Pilot_OnReceive;
+                Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
             else if (Pilot != null)
             {
-                Pilot.OnReceive -= Pilot_OnReceive;
+                Pilot.OnPilotReceive -= Pilot_OnReceive;
                 Pilot.Close();
             }
         }
@@ -270,12 +275,12 @@ namespace pilot_test
             {
                 Pilot = Pilot.Factory("192.168.1.30");
                 //Pilot = Pilot.Factory("127.0.0.1");
-                Pilot.OnReceive += Pilot_OnReceive;
+                Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
             else if (Pilot != null)
             {
-                Pilot.OnReceive -= Pilot_OnReceive;
+                Pilot.OnPilotReceive -= Pilot_OnReceive;
                 Pilot.Close();
             }
         }

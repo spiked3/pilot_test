@@ -92,7 +92,7 @@ namespace spiked3
                 if (ListBox == null)
                     return;
 
-                ListBox.Dispatcher.Invoke(() =>
+                ListBox.Dispatcher.InvokeAsync(() =>
                 {
                     int CatagoryLevel;
 

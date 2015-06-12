@@ -18,15 +18,13 @@ namespace pilot_test
     public class Pilot
     {
         MqttClient Mq;
-        private SerialPort Serial;
+        private PilotSerial Serial;
 
-        int recvIdx = 0;
-        byte[] recvbuf = new byte[4096];
 
         public string CommStatus { get; internal set; }
 
         public delegate void ReceiveHandler(dynamic json);
-        public event ReceiveHandler OnReceive;
+        public event ReceiveHandler OnPilotReceive;
 
         public static Pilot Factory(string uri)     // not really a uri, yet
         {
@@ -71,8 +69,8 @@ namespace pilot_test
                         Trace.WriteLine(j.Trim() + "\r\n", "error");
                     else if (j.StartsWith("/"))
                         Trace.WriteLine(j.Trim() + "\r\n", "+");
-                    else if (OnReceive != null)
-                        OnReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
+                    else if (OnPilotReceive != null)
+                        OnPilotReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
                     break;
             }
         }
@@ -90,14 +88,16 @@ namespace pilot_test
             Trace.WriteLine("Serial closed", "3");
         }
 
+
         private void SerialOpen(string c)
         {
-            Serial = new SerialPort(c, 115200);
+            Serial = new PilotSerial(c, 115200);
             try
             {
                 Serial.Open();
                 Serial.WriteTimeout = 50;
-                SerialHandler(Serial);
+                Serial.OnReceive += Serial_OnReceive;
+                Serial.Start();
             }
             catch (Exception ex)
             {
@@ -106,56 +106,10 @@ namespace pilot_test
             Trace.WriteLine($"Serial opened({Serial.IsOpen}) on {Serial.PortName}", "2");
         }
 
-        void AppSerialDataEvent(byte[] received)
+        private void Serial_OnReceive(dynamic json)
         {
-            foreach (var b in received)
-            {
-                if (b == '\n')
-                {
-                    recvbuf[recvIdx] = 0;
-                    string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx); // makes a copy
-                    Trace.WriteLine("com->" + line.Trim(new char[] { '\r', '\n' }));
-                    if (OnReceive != null)
-                        OnReceive(JsonConvert.DeserializeObject(line));
-                    recvIdx = 0;
-                    continue;
-                }
-                else
-                    recvbuf[recvIdx++] = (byte)b;
-
-                if (recvIdx >= recvbuf.Length)
-                    System.Diagnostics.Debugger.Break();    // overflow +++ atempt recovery
-            }
-        }
-
-        void SerialHandler(SerialPort port)
-        {
-            byte[] buffer = new byte[1024];
-            Action kickoffRead = null;
-            kickoffRead = delegate
-            {
-                port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
-                {
-                    if (port?.IsOpen ?? false)
-                    {
-                        try
-                        {
-                            int actualLength = port.BaseStream.EndRead(ar);
-                            byte[] received = new byte[actualLength];
-                            Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
-                            AppSerialDataEvent(received);
-                        }
-                        catch (Exception exc)
-                        {
-                            Trace.WriteLine(exc.Message);
-                        }
-                        if (port?.IsOpen ?? false)
-                            kickoffRead();  // re-trigger
-                    }
-                }, null);
-            };
-
-            kickoffRead();
+            if (OnPilotReceive != null)    // bubble
+                OnPilotReceive(json);
         }
 
         void SerialSend(string t)

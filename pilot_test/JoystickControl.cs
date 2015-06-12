@@ -22,7 +22,6 @@ using System.Windows.Threading;
 using System.Windows.Input;
 using rChordata;
 using System.Diagnostics;
-//using XInputDotNetPure;
 
 #endregion
 
@@ -75,21 +74,6 @@ namespace spiked3
 
         void TimerTick(object sender, EventArgs e)
         {
-            //var c = GamePad.GetState(PlayerIndex.One);
-            //if (c.IsConnected)
-            //{
-            //    //Trace.WriteLine($"game x({c.ThumbSticks.Right.X}) y({c.ThumbSticks.Right.Y})");
-            //    var p = new DoublePoint(-c.ThumbSticks.Right.X * 100, c.ThumbSticks.Right.Y * 100);
-
-            //    mouseDraggedLocation = new Point(
-            //        map(c.ThumbSticks.Right.X, -1, 1, 0, ActualWidth),
-            //        map(c.ThumbSticks.Right.Y, 1, -1, 0, ActualHeight));
-
-            //    DiamondPoint = DiamondToolbox.CartesianToDiamond(p, 100);
-            //    if (JoystickMovedListeners != null)
-            //        JoystickMovedListeners(DiamondPoint);
-            //}
-
             InvalidateVisual();
         }
 
