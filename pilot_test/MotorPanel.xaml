@@ -29,16 +29,16 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Label Content="Proportion" Grid.Row="0" Grid.Column="0" Width="72" />
-        <Label Content="{Binding ElementName=slKp, Path=Value}" ContentStringFormat="{}{0:F3}" Grid.Row="0" Grid.Column="1" Width="32"/>
-        <Slider x:Name="slKp" Minimum="0" Maximum=".1" TickFrequency=".001" Value="{Binding Kp}" Grid.Row="0" Grid.Column="2" />
+        <Label Content="Proportion" Grid.Row="0" Grid.Column="0" />
+        <Label Content="{Binding ElementName=slKp, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="0" Grid.Column="1" />
+        <Slider x:Name="slKp" Minimum="0" Maximum=".01" TickFrequency=".001" Value="{Binding Kp}" Grid.Row="0" Grid.Column="2" />
 
         <Label Content="Integral" Grid.Row="1" Grid.Column="0" />
-        <Label Content="{Binding ElementName=slKi, Path=Value}" ContentStringFormat="{}{0:F3}" Grid.Row="1" Grid.Column="1" />
+        <Label Content="{Binding ElementName=slKi, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="1" Grid.Column="1" />
         <Slider x:Name="slKi" Minimum="0" Maximum=".5" TickFrequency=".01" Value="{Binding Ki}" Grid.Row="1" Grid.Column="2" />
 
         <Label Content="Derivative" Grid.Row="2" Grid.Column="0" />
-        <Label Content="{Binding ElementName=slKd, Path=Value}" ContentStringFormat="{}{0:F3}" Grid.Row="2" Grid.Column="1" />
+        <Label Content="{Binding ElementName=slKd, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="2" Grid.Column="1" />
         <Slider x:Name="slKd" Minimum="0" Maximum=".5" TickFrequency=".001" Value="{Binding Kd}" Grid.Row="2" Grid.Column="2" />
 
         <Button Grid.Row="3" Style="{StaticResource sendButton}" Foreground="White" Background="DarkGray" Click="Send_Click" />

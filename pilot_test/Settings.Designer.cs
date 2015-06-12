@@ -142,5 +142,29 @@ namespace pilot_test {
                 this["Split1"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public float TurnH {
+            get {
+                return ((float)(this["TurnH"]));
+            }
+            set {
+                this["TurnH"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public float TurnPwr {
+            get {
+                return ((float)(this["TurnPwr"]));
+            }
+            set {
+                this["TurnPwr"] = value;
+            }
+        }
     }
 }

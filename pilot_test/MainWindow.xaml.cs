@@ -99,7 +99,7 @@ namespace pilot_test
             set { SetValue(TurnHProperty, value); }
         }
         public static readonly DependencyProperty TurnHProperty =
-            DependencyProperty.Register("TurnH", typeof(float), typeof(MainWindow));
+            DependencyProperty.Register("TurnH", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.TurnH));
 
         public float TurnPwr
         {
@@ -107,7 +107,7 @@ namespace pilot_test
             set { SetValue(TurnPwrProperty, value); }
         }
         public static readonly DependencyProperty TurnPwrProperty =
-            DependencyProperty.Register("TurnPwr", typeof(float), typeof(MainWindow));
+            DependencyProperty.Register("TurnPwr", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.TurnPwr));
 
         #endregion
 
@@ -158,6 +158,9 @@ namespace pilot_test
             Settings.Default.Kp = Kp;
             Settings.Default.Ki = Ki;
             Settings.Default.Kd = Kd;
+
+            Settings.Default.TurnH = TurnH;
+            Settings.Default.TurnPwr = TurnPwr;
 
             Settings.Default.Save();
         }
@@ -431,6 +434,12 @@ namespace pilot_test
         }
 
         float previousIntegral, previousDerivative, previousError;
+
+        private void Power0_Click(object sender, RoutedEventArgs e)
+        {
+            Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
+        }
+
         private float simplePid(float err, float Kp, float Ki, float Kd, TimeSpan elapsed)
         {
             float dt = (float)elapsed.TotalSeconds;
