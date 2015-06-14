@@ -276,8 +276,8 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_MQTT");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("192.168.1.30");
-                //Pilot = Pilot.Factory("127.0.0.1");
+                //Pilot = Pilot.Factory("192.168.1.30");
+                Pilot = Pilot.Factory("127.0.0.1");
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
