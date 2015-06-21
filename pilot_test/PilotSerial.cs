@@ -38,6 +38,7 @@ namespace pilot_test
                     }
                     catch (Exception exc)
                     {
+                        //System.Diagnostics.Debugger.Break();
                         Trace.WriteLine(exc.Message);
                     }
                     if (IsOpen)
@@ -55,23 +56,23 @@ namespace pilot_test
                 if (b == '\n')
                 {
                     recvbuf[recvIdx] = 0;
-                    string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx); // makes a copy
-                    Trace.WriteLine("com->" + line.Trim(new char[] { '\r', '\n' }));
-
-                    try
+                    string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx).Trim(new char[] { '\r', '\n' });
+                    if (line.StartsWith("//"))      // deprecated
+                        Trace.WriteLine("com->" + line,"+");
+                    else
                     {
-                        if (OnReceive != null)
-                            OnReceive(JsonConvert.DeserializeObject(line));
+                        try
+                        {
+                            if (OnReceive != null)
+                                OnReceive(JsonConvert.DeserializeObject(line));
+                        }
+                        catch (Exception)
+                        {
+                            System.Diagnostics.Debugger.Break();
+                            throw;
+                        }
                     }
-                    catch (Exception)
-                    {
-
-                        throw;
-                    }
-                    finally
-                    {
-                        recvIdx = 0;                        
-                    }
+                    recvIdx = 0;
                 }
                 else
                     recvbuf[recvIdx++] = (byte)b;

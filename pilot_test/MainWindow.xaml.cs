@@ -29,6 +29,14 @@ namespace pilot_test
     {
         #region dp
 
+        public float MotorPower
+        {
+            get { return (float)GetValue(MotorPowerProperty); }
+            set { SetValue(MotorPowerProperty, value); }
+        }
+        public static readonly DependencyProperty MotorPowerProperty =
+            DependencyProperty.Register("MotorPower", typeof(float), typeof(MainWindow), new PropertyMetadata(OnMotorPowerChanged));
+
         public string CommStatus
         {
             get { return (string)GetValue(CommStatusProperty); }
@@ -204,6 +212,9 @@ namespace pilot_test
         {
             switch ((string)(json["T"]))
             {
+                case "Log":
+                    Dispatcher.InvokeAsync(() => { RecieveLog(json); });
+                    break;
                 case "Heartbeat":
                     Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); });
                     break;
@@ -213,7 +224,23 @@ namespace pilot_test
                 case "Moved":
                     Dispatcher.InvokeAsync(() => { ReceivedMoved(json); });
                     break;
+                case "Bumper":
+                    Dispatcher.InvokeAsync(() => { ReceivedBumper(json); });
+                    break;
             }
+        }
+
+        private void RecieveLog(dynamic json)
+        {
+            // if msg starts with E log as error
+            bool isError = false;
+            string t = json["Msg"];
+            if (t.StartsWith("E"))
+            {
+                isError = true;
+                t = t.Substring(1);
+            }
+            Trace.WriteLine(t, isError ? "error" : "+");
         }
 
         private void ReceivedPose(dynamic j)
@@ -270,14 +297,30 @@ namespace pilot_test
             }
         }
 
-        [UiButton("MQTT", "Black", "White", isToggle =true)]
+        [UiButton("MQTT", "Black", "White", isToggle = true)]
         public void ToggleButton_MQTT(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::ToggleButton_MQTT");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                //Pilot = Pilot.Factory("192.168.1.30");
                 Pilot = Pilot.Factory("127.0.0.1");
+                Pilot.OnPilotReceive += Pilot_OnReceive;
+                CommStatus = Pilot.CommStatus;
+            }
+            else if (Pilot != null)
+            {
+                Pilot.OnPilotReceive -= Pilot_OnReceive;
+                Pilot.Close();
+            }
+        }
+
+        [UiButton("MQTT Pi", "Black", "White", isToggle = true)]
+        public void ToggleButton_MQTT_Pi(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::ToggleButton_MQTT");
+            if ((sender as ToggleButton).IsChecked ?? false)
+            {
+                Pilot = Pilot.Factory("192.168.1.2");
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
@@ -365,7 +408,8 @@ namespace pilot_test
         private void Turn_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Turn_Click");
-            Pilot.Send(new { Cmd = "Pwr", M1 = -TurnPwr, M2 = TurnPwr, hStop = TurnH });
+            int turnDir = TurnH > H ? 1 : -1;
+            Pilot.Send(new { Cmd = "Pwr", M1 = -TurnPwr * turnDir, M2 = TurnPwr * turnDir, hStop = TurnH });
         }
 
         [UiButton("Bumper", "Black", "White", isToggle = true)]
@@ -375,14 +419,6 @@ namespace pilot_test
             int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
             Pilot.Send(new { Cmd = "Bumper", Value = OnOff });
         }
-
-        public float MotorPower
-        {
-            get { return (float)GetValue(MotorPowerProperty); }
-            set { SetValue(MotorPowerProperty, value); }
-        }
-        public static readonly DependencyProperty MotorPowerProperty =
-            DependencyProperty.Register("MotorPower", typeof(float), typeof(MainWindow), new PropertyMetadata(OnMotorPowerChanged));
 
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)
         {
@@ -419,8 +455,14 @@ namespace pilot_test
 
         private void ReceivedMoved(dynamic j)
         {
-            string v = j["Value"].asBoolean() ? "True" : "False";
-            Trace.WriteLine($"ReceivedMoved ({v})");
+            string v = j["Value"] == 1 ? "True" : "False";
+            Trace.WriteLine($"Received Moved ({v})");
+        }
+
+        private void ReceivedBumper(dynamic j)
+        {
+            string v = j["Value"] == 1 ? "True" : "False";
+            Trace.WriteLine($"Received Bumper ({v})");
         }
 
         private float constrain(float v, int mi, int ma)

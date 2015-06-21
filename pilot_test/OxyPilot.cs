@@ -21,9 +21,14 @@ namespace pilot_test
                 Series.Add(new LineSeries { Title = k });
         }
 
+        Dictionary<string, LineSeries> SeriesDict = new Dictionary<string, LineSeries>();
+
         public void Append(dynamic j)
         {
             var t = DateTimeAxis.ToDouble(DateTime.Now);
+
+            // +++ if we have not seen it before, add it to the plot
+            //LineSeries s = SeriesDict[??];
 
             foreach (LineSeries ls in Series)
             { 
