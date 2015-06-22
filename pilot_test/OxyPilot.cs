@@ -3,6 +3,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,13 +22,16 @@ namespace pilot_test
                 Series.Add(new LineSeries { Title = k });
         }
 
-        Dictionary<string, LineSeries> SeriesDict = new Dictionary<string, LineSeries>();
+        //Dictionary<string, LineSeries> SeriesDict = new Dictionary<string, LineSeries>();
 
         public void Append(dynamic j)
         {
             var t = DateTimeAxis.ToDouble(DateTime.Now);
 
             // +++ if we have not seen it before, add it to the plot
+            //foreach (string k in j.Keys)
+            //{}
+
             //LineSeries s = SeriesDict[??];
 
             foreach (LineSeries ls in Series)

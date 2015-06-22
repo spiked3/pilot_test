@@ -97,8 +97,18 @@ namespace pilot_test
             set { SetValue(oxy1ModelProperty, value); }
         }
         public static readonly DependencyProperty oxy1ModelProperty =
-            DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow),                
-                new PropertyMetadata(new OxyPilot(new[] { "T1", "V1", "I1", "D1", "PW1", "F1" })
+            DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow),
+                new PropertyMetadata(new OxyPilot(new[] { "T1", "V1", "I1", "D1", "PW1" })
+                { LegendBorder = OxyColors.Black }));
+
+        public OxyPilot oxy2Model
+        {
+            get { return (OxyPilot)GetValue(oxy2ModelProperty); }
+            set { SetValue(oxy2ModelProperty, value); }
+        }
+        public static readonly DependencyProperty oxy2ModelProperty =
+            DependencyProperty.Register("oxy2Model", typeof(OxyPilot), typeof(MainWindow),
+                new PropertyMetadata(new OxyPilot(new[] { "T2", "V2", "I2", "D2", "PW2" })
                 { LegendBorder = OxyColors.Black }));
 
         public float TurnH
@@ -211,7 +221,7 @@ namespace pilot_test
                     Dispatcher.InvokeAsync(() => { RecieveLog(json); });
                     break;
                 case "Heartbeat":
-                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); });
+                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); oxy2Model.Append(json); oxy2.InvalidatePlot(); });
                     break;
                 case "Pose":
                     Dispatcher.InvokeAsync(() => { ReceivedPose(json); });
@@ -326,14 +336,6 @@ namespace pilot_test
             }
         }
 
-        [UiButton("ESTOP", "White", "Red")]
-        public void EStop_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::EStop_Click");
-            Pilot.Send(new { Cmd = "Esc", Value = 0 });
-            Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-        }
-
         [UiButton("Esc", "Black", "White", isToggle = true)]
         public void ToggleButton_Esc(object sender, RoutedEventArgs e)
         {
@@ -398,13 +400,6 @@ namespace pilot_test
         {
             Trace.WriteLine("::HbSlow_Click");
             Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
-        }
-
-        private void Turn_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Turn_Click");
-            int turnDir = TurnH > H ? 1 : -1;
-            Pilot.Send(new { Cmd = "Pwr", M1 = -TurnPwr * turnDir, M2 = TurnPwr * turnDir, hStop = TurnH });
         }
 
         [UiButton("Bumper", "Black", "White", isToggle = true)]

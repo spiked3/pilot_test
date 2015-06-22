@@ -72,8 +72,9 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel> >
 
-                <StackPanel Orientation="Vertical" VerticalAlignment="Top" >
-                    <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" Background="Orange" Click="Power0_Click" />
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" >          
+                    <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" 
+                            Foreground="White" Background="Red" Click="Power0_Click" />
                     <StackPanel Orientation="Horizontal" Margin="4" >
                         <Label Content="Pwr" />
                         <TextBox Text="{Binding MotorPower,UpdateSourceTrigger=PropertyChanged,Delay=500}" />
@@ -81,13 +82,6 @@
                         <Border BorderThickness="1" BorderBrush="Black" Margin="8,0" >
                             <Label Content="Caution: Automatic send on change" Background="Yellow" />
                         </Border>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="4" >
-                        <Label Content="TurnH" />
-                        <TextBox Text="{Binding TurnH}" />
-                        <Label Content="TurnPwr" />
-                        <TextBox Text="{Binding TurnPwr}" />
-                        <Button Style="{StaticResource sendButton}" Click="Turn_Click" Foreground="White" Background="DarkGray"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="4" >
@@ -104,6 +98,7 @@
                 <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
 
                 <Oxy:PlotView x:Name="oxy1" Model="{Binding oxy1Model}" Width="640" Margin="4,2" Height="480" />
+                <Oxy:PlotView x:Name="oxy2" Model="{Binding oxy2Model}" Width="640" Margin="4,2" Height="480" />
 
             </ListBox>
 
