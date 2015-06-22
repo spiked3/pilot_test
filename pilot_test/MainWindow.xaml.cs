@@ -203,11 +203,6 @@ namespace pilot_test
             Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
-        //protected override void OnContentRendered(EventArgs e)
-        //{
-        //    //base.OnContentRendered(e);
-        //}
-
         private void Pilot_OnReceive(dynamic json)
         {
             switch ((string)(json["T"]))
@@ -395,7 +390,7 @@ namespace pilot_test
         public void HbFast_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbFast_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 100 });
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
         }
 
         [UiButton("HB slow")]
@@ -493,7 +488,6 @@ namespace pilot_test
             previousError = err;
             return output;
         }
-
     }
 
     [AttributeUsage(AttributeTargets.Method)]
@@ -511,5 +505,4 @@ namespace pilot_test
             Bg = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Background));
         }
     }
-
 }

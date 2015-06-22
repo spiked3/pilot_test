@@ -65,11 +65,12 @@ namespace pilot_test
             {
                 case "robot1":
                     string j = System.Text.Encoding.UTF8.GetString(e.Message);
-                    if (j.StartsWith("//!"))
-                        Trace.WriteLine(j.Trim() + "\r\n", "error");
-                    else if (j.StartsWith("/"))
-                        Trace.WriteLine(j.Trim() + "\r\n", "+");
-                    else if (OnPilotReceive != null)
+                    //if (j.StartsWith("//!"))
+                    //    Trace.WriteLine(j.Trim() + "\r\n", "error");
+                    //else if (j.StartsWith("//"))
+                    //    Trace.WriteLine(j.Trim() + "\r\n", "+");
+                    //else
+                    if (OnPilotReceive != null)
                         OnPilotReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
                     break;
             }
