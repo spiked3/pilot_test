@@ -54,7 +54,14 @@ namespace pilot_test
         {
             Mq = new MqttClient(c);
             Mq.MqttMsgPublishReceived += MqttMsgPublishReceived;
-            Mq.Connect("pTest");
+            try
+            {                
+                Mq.Connect("pTest");
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             Trace.WriteLine($"Connected to MQTT @ {c}", "1");
             Mq.Subscribe(new string[] { "robot1/#" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
         }

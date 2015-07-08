@@ -127,6 +127,14 @@ namespace pilot_test
         public static readonly DependencyProperty TurnPwrProperty =
             DependencyProperty.Register("TurnPwr", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.TurnPwr));
 
+        public string tbPiIP
+        {
+            get { return (string)GetValue(tbPiIPProperty); }
+            set { SetValue(tbPiIPProperty, value); }
+        }
+        public static readonly DependencyProperty tbPiIPProperty =
+            DependencyProperty.Register("tbPiIP", typeof(string), typeof(MainWindow), new PropertyMetadata("192.168.1.19"));
+
         #endregion
 
         public static MainWindow _theInstance;
@@ -325,7 +333,7 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_MQTT");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("192.168.1.2");
+                Pilot = Pilot.Factory(tbPi.Text);
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
