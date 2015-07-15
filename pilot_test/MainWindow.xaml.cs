@@ -20,6 +20,7 @@ using OxyPlot.Series;
 using OxyPlot.Axes;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using NDesk.Options;
 
 // DoEvents:  Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
 
@@ -137,6 +138,8 @@ namespace pilot_test
 
         #endregion
 
+        string mqttBroker = "127.0.0.1";
+
         public static MainWindow _theInstance;
         Pilot Pilot;
         
@@ -159,6 +162,13 @@ namespace pilot_test
             _theInstance = this;
             InitializeComponent();
             MotorPower = 0;
+
+            var p = new OptionSet
+            {
+                   { "mqtt=", (v) => { mqttBroker = v; } },
+            };
+
+            p.Parse(Environment.GetCommandLineArgs());
 
             Width = Settings.Default.Width;
             Height = Settings.Default.Height;
@@ -234,11 +244,8 @@ namespace pilot_test
                 case "Pose":
                     Dispatcher.InvokeAsync(() => { ReceivedPose(json); });
                     break;
-                case "Moved":
-                    Dispatcher.InvokeAsync(() => { ReceivedMoved(json); });
-                    break;
-                case "Bumper":
-                    Dispatcher.InvokeAsync(() => { ReceivedBumper(json); });
+                case "Event":
+                    Dispatcher.InvokeAsync(() => { ReceivedEvent(json); });
                     break;
             }
         }
@@ -316,24 +323,7 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_MQTT");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("127.0.0.1");
-                Pilot.OnPilotReceive += Pilot_OnReceive;
-                CommStatus = Pilot.CommStatus;
-            }
-            else if (Pilot != null)
-            {
-                Pilot.OnPilotReceive -= Pilot_OnReceive;
-                Pilot.Close();
-            }
-        }
-
-        [UiButton("MQTT Pi", "Black", "White", isToggle = true)]
-        public void ToggleButton_MQTT_Pi(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::ToggleButton_MQTT");
-            if ((sender as ToggleButton).IsChecked ?? false)
-            {
-                Pilot = Pilot.Factory(tbPi.Text);
+                Pilot = Pilot.Factory(mqttBroker);
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
@@ -373,7 +363,7 @@ namespace pilot_test
             // +++  I can NOT resolve the measured value with actual reality :(
             Trace.WriteLine("::Geom_Click");
             // new: ticks per meter, motormax ticks per second 
-            Pilot.Send(new { Cmd = "Config", Geom = new float[] { (float)( (1000 / (Math.PI * 175) * 60) ),  450F } });
+            Pilot.Send(new { Cmd = "Config", Geom = new float[] { 336.2F,  450F } });
         }
 
         [UiButton("Cali")]
@@ -410,14 +400,6 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
         }
 
-        [UiButton("Bumper", "Black", "White", isToggle = true)]
-        public void ToggleButton_Bumper(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::ToggleButton_Bumper");
-            int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-            Pilot.Send(new { Cmd = "Bumper", Value = OnOff });
-        }
-
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)
         {
             float p = (float)source.GetValue(MotorPowerProperty);
@@ -425,72 +407,28 @@ namespace pilot_test
             _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "Pwr", M1 = p, M2 = p }); } );
         }
 
-        [UiButton("Straight 1M", "White", "Magenta")]
-        public void Straight_1M(object sender, RoutedEventArgs e)
+        private void ReceivedEvent(dynamic j)
         {
-            //float distGoal = 1F;
-            //Trace.WriteLine("::Straight_1M");
-            //float startX = X, startY = Y, startH = H;
-
-            //DateTime lastTime = DateTime.Now;
-
-            //    DateTime nowTime = DateTime.Now;
-            //    TimeSpan elapsed = nowTime - lastTime;
-            //    float min = distGoal - travelThreshold,
-            //        dist = Math.Abs(distance(startX, X, startY, Y));
-            //    bool arrived = dist >= min;
-            //    if (arrived)
-            //    {
-            //        Trace.WriteLine($" Arrive");
-            //        Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
-            //        return;
-            //    }
-
-            //    //Adjustment = constrain(Adjustment, -10, 10);
-            //    //Trace.WriteLine($" Adjust {Adjustment} M1({40 - Adjustment}) M1({40 + Adjustment})");
-            //    Pilot.Send(new { Cmd = "Pwr", M1 = 40.0 , M2 = 40.0});
+            int i = j["Value"];
+            string e = j["Event"];
+            Trace.WriteLine($"Received Event ({e}) Value ({i})");
         }
 
-        private void ReceivedMoved(dynamic j)
-        {
-            string v = j["Value"] == 1 ? "True" : "False";
-            Trace.WriteLine($"Received Moved ({v})");
-        }
+        //private float constrain(float v, int mi, int ma)
+        //{
+        //    return Math.Max(Math.Min(ma, v), mi);
+        //}
 
-        private void ReceivedBumper(dynamic j)
-        {
-            string v = j["Value"] == 1 ? "True" : "False";
-            Trace.WriteLine($"Received Bumper ({v})");
-        }
-
-        private float constrain(float v, int mi, int ma)
-        {
-            return Math.Max(Math.Min(ma, v), mi);
-        }
-
-        static float distance(float startX, float x, float startY, float y)
-        {
-            return (float)(Math.Sqrt((x - startX) * (x - startX) + (y - startY) * (y - startY)));
-        }
-
-        float previousIntegral, previousDerivative, previousError;
+        //static float distance(float startX, float x, float startY, float y)
+        //{
+        //    return (float)(Math.Sqrt((x - startX) * (x - startX) + (y - startY) * (y - startY)));
+        //}
 
         private void Power0_Click(object sender, RoutedEventArgs e)
         {
             Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
         }
 
-        private float simplePid(float err, float Kp, float Ki, float Kd, TimeSpan elapsed)
-        {
-            float dt = (float)elapsed.TotalSeconds;
-            float integral = (previousIntegral + err) * dt;
-            float derivative = (previousDerivative - err) * dt;
-            float output = Kp * err + Ki * integral + Kd * derivative;
-            previousIntegral = integral;
-            previousDerivative = derivative;
-            previousError = err;
-            return output;
-        }
     }
 
     [AttributeUsage(AttributeTargets.Method)]

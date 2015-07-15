@@ -14,8 +14,6 @@
                 <Separator />
                 <MenuItem Header="E_xit" Click="ExitMenuItem_Click" />
             </MenuItem>
-            <Label Content="Pi IP" />
-            <TextBox x:Name="tbPi" Text="192.168.1.2" Width="96" />
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <StackPanel Orientation="Horizontal" >
