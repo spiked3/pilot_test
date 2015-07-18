@@ -98,36 +98,36 @@ namespace pilot_test {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
-        public float Kp {
+        public float MotorKp {
             get {
-                return ((float)(this["Kp"]));
+                return ((float)(this["MotorKp"]));
             }
             set {
-                this["Kp"] = value;
+                this["MotorKp"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public float Ki {
+        public float MotorKi {
             get {
-                return ((float)(this["Ki"]));
+                return ((float)(this["MotorKi"]));
             }
             set {
-                this["Ki"] = value;
+                this["MotorKi"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.01")]
-        public float Kd {
+        public float MotorKd {
             get {
-                return ((float)(this["Kd"]));
+                return ((float)(this["MotorKd"]));
             }
             set {
-                this["Kd"] = value;
+                this["MotorKd"] = value;
             }
         }
         
@@ -164,6 +164,42 @@ namespace pilot_test {
             }
             set {
                 this["TurnPwr"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float HdgKp {
+            get {
+                return ((float)(this["HdgKp"]));
+            }
+            set {
+                this["HdgKp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float HdgKi {
+            get {
+                return ((float)(this["HdgKi"]));
+            }
+            set {
+                this["HdgKi"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float HdgKd {
+            get {
+                return ((float)(this["HdgKd"]));
+            }
+            set {
+                this["HdgKd"] = value;
             }
         }
     }

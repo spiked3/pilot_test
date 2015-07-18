@@ -84,8 +84,8 @@
     </ApplicationDefinition>
     <Compile Include="JoystickControl.cs" />
     <Compile Include="Pilot.cs" />
-    <Compile Include="MotorPanel.xaml.cs">
-      <DependentUpon>MotorPanel.xaml</DependentUpon>
+    <Compile Include="PidPanel.xaml.cs">
+      <DependentUpon>PidPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="OxyPilot.cs" />
     <Compile Include="PilotSerial.cs">
@@ -97,7 +97,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Page Include="MotorPanel.xaml">
+    <Page Include="PidPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

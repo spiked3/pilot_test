@@ -68,8 +68,8 @@ namespace pilot_test
                         }
                         catch (Exception)
                         {
-                            System.Diagnostics.Debugger.Break();
-                            throw;
+                            //System.Diagnostics.Debugger.Break();
+                            //throw;
                         }
                     }
                     recvIdx = 0;

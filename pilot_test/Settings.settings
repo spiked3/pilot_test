@@ -20,13 +20,13 @@
     <Setting Name="MotorPower" Type="System.Double" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="Kp" Type="System.Single" Scope="User">
+    <Setting Name="MotorKp" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.4</Value>
     </Setting>
-    <Setting Name="Ki" Type="System.Single" Scope="User">
+    <Setting Name="MotorKi" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Kd" Type="System.Single" Scope="User">
+    <Setting Name="MotorKd" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.01</Value>
     </Setting>
     <Setting Name="Split1" Type="System.Double" Scope="User">
@@ -37,6 +37,15 @@
     </Setting>
     <Setting Name="TurnPwr" Type="System.Single" Scope="User">
       <Value Profile="(Default)">30</Value>
+    </Setting>
+    <Setting Name="HdgKp" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="HdgKi" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="HdgKd" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -17,19 +17,27 @@ using System.Windows.Threading;
 
 namespace pilot_test
 {
-    /// <summary>
-    /// Interaction logic for pidControl.xaml
-    /// </summary>
-    public partial class MotorPanel : UserControl
+    public partial class PidPanel : UserControl
     {
-        public MotorPanel()
+        public event EventHandler Click;
+
+        public PidPanel()
         {
             InitializeComponent();            
         }
 
-        private void Send_Click(object sender, RoutedEventArgs e)
+        private void Click_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow._theInstance.Pid_Click(sender, e);
+            if (Click != null)
+                Click(this, e);
+            //MainWindow._theInstance.Pid_Click(sender, e);
         }
+    }
+
+    public class PidData
+    {
+        public float Kp { get; set; }
+        public float Ki { get; set; }
+        public float Kd { get; set; }
     }
 }

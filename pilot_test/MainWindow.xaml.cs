@@ -46,27 +46,21 @@ namespace pilot_test
         public static readonly DependencyProperty CommStatusProperty =
             DependencyProperty.Register("CommStatus", typeof(string), typeof(MainWindow), new PropertyMetadata("Not Available"));
 
-        public float Kp
+        public PidData MotorPid
         {
-            get { return (float)GetValue(KpProperty); }
-            set { SetValue(KpProperty, value); }
+            get { return (PidData)GetValue(MotorPidProperty); }
+            set { SetValue(MotorPidProperty, value); }
         }
-        public static readonly DependencyProperty KpProperty =
-            DependencyProperty.Register("Kp", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kp));
-        public float Ki
+        public static readonly DependencyProperty MotorPidProperty =
+            DependencyProperty.Register("MotorPid", typeof(PidData), typeof(MainWindow), new PropertyMetadata(new PidData()));
+
+        public PidData HdgPid
         {
-            get { return (float)GetValue(KiProperty); }
-            set { SetValue(KiProperty, value); }
+            get { return (PidData)GetValue(HdgPidProperty); }
+            set { SetValue(HdgPidProperty, value); }
         }
-        public static readonly DependencyProperty KiProperty =
-            DependencyProperty.Register("Ki", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Ki));
-        public float Kd
-        {
-            get { return (float)GetValue(KdProperty); }
-            set { SetValue(KdProperty, value); }
-        }
-        public static readonly DependencyProperty KdProperty =
-            DependencyProperty.Register("Kd", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.Kd));
+        public static readonly DependencyProperty HdgPidProperty =
+            DependencyProperty.Register("HdgPid", typeof(PidData), typeof(MainWindow), new PropertyMetadata(new PidData()));
 
         public float X
         {
@@ -112,6 +106,16 @@ namespace pilot_test
                 new PropertyMetadata(new OxyPilot(new[] { "T2", "V2", "I2", "D2", "PW2" })
                 { LegendBorder = OxyColors.Black }));
 
+        public OxyPilot oxy3Model
+        {
+            get { return (OxyPilot)GetValue(oxy3ModelProperty); }
+            set { SetValue(oxy3ModelProperty, value); }
+        }
+        public static readonly DependencyProperty oxy3ModelProperty =
+            DependencyProperty.Register("oxy3Model", typeof(OxyPilot), typeof(MainWindow),
+                new PropertyMetadata(new OxyPilot(new[] { "Error", "Adjustment", "Integral", "Derivative", "PrevError" })
+                { LegendBorder = OxyColors.Black }));
+
         public float TurnH
         {
             get { return (float)GetValue(TurnHProperty); }
@@ -127,14 +131,6 @@ namespace pilot_test
         }
         public static readonly DependencyProperty TurnPwrProperty =
             DependencyProperty.Register("TurnPwr", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.TurnPwr));
-
-        public string tbPiIP
-        {
-            get { return (string)GetValue(tbPiIPProperty); }
-            set { SetValue(tbPiIPProperty, value); }
-        }
-        public static readonly DependencyProperty tbPiIPProperty =
-            DependencyProperty.Register("tbPiIP", typeof(string), typeof(MainWindow), new PropertyMetadata("192.168.1.19"));
 
         #endregion
 
@@ -160,7 +156,18 @@ namespace pilot_test
         public MainWindow()
         {
             _theInstance = this;
+            MotorPid.Kp = Settings.Default.MotorKp;
+            MotorPid.Ki = Settings.Default.MotorKi;
+            MotorPid.Kd = Settings.Default.MotorKd;
+
+            HdgPid.Kp = Settings.Default.HdgKp;
+            HdgPid.Ki = Settings.Default.HdgKi;
+            HdgPid.Kd = Settings.Default.HdgKd;
+
             InitializeComponent();
+
+            motorPid1.Click += mototPid1_Click;
+            hdgPid1.Click += hdgPid1_Click;
             MotorPower = 0;
 
             var p = new OptionSet
@@ -191,9 +198,13 @@ namespace pilot_test
             Settings.Default.Left = Left;
             Settings.Default.Split1 = mainGrid.RowDefinitions[1].Height.Value;
 
-            Settings.Default.Kp = Kp;
-            Settings.Default.Ki = Ki;
-            Settings.Default.Kd = Kd;
+            Settings.Default.MotorKp = MotorPid.Kp;
+            Settings.Default.MotorKi = MotorPid.Ki;
+            Settings.Default.MotorKd = MotorPid.Kd;
+
+            Settings.Default.HdgKp = HdgPid.Kp;
+            Settings.Default.HdgKi = HdgPid.Ki;
+            Settings.Default.HdgKd = HdgPid.Kd;
 
             Settings.Default.TurnH = TurnH;
             Settings.Default.TurnPwr = TurnPwr;
@@ -233,13 +244,24 @@ namespace pilot_test
 
         private void Pilot_OnReceive(dynamic json)
         {
+            Dispatcher.InvokeAsync(() =>
+            {
+                string t = JsonConvert.SerializeObject(json);
+                Trace.WriteLine(t, "5");
+            });
+
             switch ((string)(json["T"]))
             {
                 case "Log":
                     Dispatcher.InvokeAsync(() => { RecieveLog(json); });
                     break;
-                case "Heartbeat":
+                case "MTelem":
                     Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); oxy2Model.Append(json); oxy2.InvalidatePlot(); });
+                    break;
+                case "STelem":
+                    Dispatcher.InvokeAsync(() => { oxy3Model.Append(json); oxy3.InvalidatePlot(); });
+                    break;
+                case "Heartbeat":                    
                     break;
                 case "Pose":
                     Dispatcher.InvokeAsync(() => { ReceivedPose(json); });
@@ -306,7 +328,7 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_Serial");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("com7");
+                Pilot = Pilot.Factory("com15");
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
@@ -350,11 +372,17 @@ namespace pilot_test
             X = Y = H = 0f;
         }
 
-        public void Pid_Click(object sender, RoutedEventArgs e)
+        private void hdgPid1_Click(object sender, EventArgs e)
+        {
+            Trace.WriteLine("::hdgPid1_Click");
+            Pilot.Send(new { Cmd = "Config", hPID = new float[] { HdgPid.Kp, HdgPid.Ki, HdgPid.Kd } });
+        }
+
+        public void mototPid1_Click(object sender, EventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt) (use data type float)
-            Trace.WriteLine("::Pid_Click");
-            Pilot.Send(new { Cmd = "Config", PID = new float[] { Kp, Ki, Kd }});
+            Trace.WriteLine("::mototPid1_Click");
+            Pilot.Send(new { Cmd = "Config", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
         }
 
         [UiButton("Geom")]
@@ -383,21 +411,28 @@ namespace pilot_test
         public void HbOff_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 0, Int = 2000 });
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 0, Int = 1000/1 });
         }
 
         [UiButton("HB fast")]
         public void HbFast_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbFast_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 500 });
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000/20 });
         }
 
         [UiButton("HB slow")]
         public void HbSlow_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbSlow_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 2000 });
+            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000 / 1 });
+        }
+
+        [UiButton("Wait")]
+        public void Wait_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::Wait_Click");
+            Pilot.Send(new { Cmd = "Wait", Pwr = 40.0 });
         }
 
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)

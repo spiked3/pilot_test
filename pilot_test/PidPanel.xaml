@@ -1,9 +1,10 @@
-﻿<UserControl x:Class="pilot_test.MotorPanel"
+﻿<UserControl x:Class="pilot_test.PidPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"              
              mc:Ignorable="d" 
+             DataContext="{Binding}"
              >
     <Grid Background="White">
         <Grid.Resources>
@@ -30,18 +31,18 @@
         </Grid.RowDefinitions>
 
         <Label Content="Proportion" Grid.Row="0" Grid.Column="0" />
-        <Label Content="{Binding ElementName=slKp, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="0" Grid.Column="1" />
-        <Slider x:Name="slKp" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Kp}" Grid.Row="0" Grid.Column="2" />
+        <Label Content="{Binding ElementName=Kp, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="0" Grid.Column="1" />
+        <Slider x:Name="Kp" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Kp}" Grid.Row="0" Grid.Column="2" />
 
         <Label Content="Integral" Grid.Row="1" Grid.Column="0" />
-        <Label Content="{Binding ElementName=slKi, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="1" Grid.Column="1" />
-        <Slider x:Name="slKi" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Ki}" Grid.Row="1" Grid.Column="2" />
+        <Label Content="{Binding ElementName=Ki, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="1" Grid.Column="1" />
+        <Slider x:Name="Ki" Minimum="0" Maximum="1" TickFrequency=".1" Value="{Binding Ki}" Grid.Row="1" Grid.Column="2" />
 
         <Label Content="Derivative" Grid.Row="2" Grid.Column="0" />
-        <Label Content="{Binding ElementName=slKd, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="2" Grid.Column="1" />
-        <Slider x:Name="slKd" Minimum="0" Maximum=".01" TickFrequency=".0005" Value="{Binding Kd}" Grid.Row="2" Grid.Column="2" />
+        <Label Content="{Binding ElementName=Kd, Path=Value}" ContentStringFormat="{}{0:F4}" Grid.Row="2" Grid.Column="1" />
+        <Slider x:Name="Kd" Minimum="0" Maximum=".01" TickFrequency=".0005" Value="{Binding Kd}" Grid.Row="2" Grid.Column="2" />
 
-        <Button Grid.Row="3" Style="{StaticResource sendButton}" Foreground="White" Background="DarkGray" Click="Send_Click" />
+        <Button Grid.Row="3" Style="{StaticResource sendButton}" Foreground="White" Background="DarkGray" Click="Click_Click" />
 
     </Grid>
 </UserControl>
