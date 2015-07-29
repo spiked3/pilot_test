@@ -44,7 +44,7 @@ namespace pilot_test
                 }
                 catch (Exception)
                 {
-                    System.Diagnostics.Debugger.Break();
+                    //System.Diagnostics.Debugger.Break();
                 }
             }
             // +++ would be nice if we could invalidate plot that we are attached to here            

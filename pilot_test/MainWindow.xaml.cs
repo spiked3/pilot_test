@@ -255,10 +255,10 @@ namespace pilot_test
                 case "Log":
                     Dispatcher.InvokeAsync(() => { RecieveLog(json); });
                     break;
-                case "MTelem":
+                case "Motors":
                     Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); oxy2Model.Append(json); oxy2.InvalidatePlot(); });
                     break;
-                case "STelem":
+                case "HdgPid":
                     Dispatcher.InvokeAsync(() => { oxy3Model.Append(json); oxy3.InvalidatePlot(); });
                     break;
                 case "Heartbeat":                    
@@ -361,28 +361,28 @@ namespace pilot_test
         {
             Trace.WriteLine("::ToggleButton_Esc");
             int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
-            Pilot.Send(new { Cmd = "Esc", Value = OnOff });
+            Pilot.Send(new { Cmd = "ESC", Value = OnOff });
         }
 
         [UiButton("Reset", "Black", "Yellow")]
         public void ResetPose_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_ResetPose");
-            Pilot.Send(new { Cmd = "Reset" });
+            Pilot.Send(new { Cmd = "RESET" });
             X = Y = H = 0f;
         }
 
         private void hdgPid1_Click(object sender, EventArgs e)
         {
             Trace.WriteLine("::hdgPid1_Click");
-            Pilot.Send(new { Cmd = "Config", hPID = new float[] { HdgPid.Kp, HdgPid.Ki, HdgPid.Kd } });
+            Pilot.Send(new { Cmd = "CONFIG", hPID = new float[] { HdgPid.Kp, HdgPid.Ki, HdgPid.Kd } });
         }
 
         public void mototPid1_Click(object sender, EventArgs e)
         {
             // critical you include the decimal point (json decoding rqmt) (use data type float)
             Trace.WriteLine("::mototPid1_Click");
-            Pilot.Send(new { Cmd = "Config", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
+            Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
         }
 
         [UiButton("Geom")]
@@ -391,55 +391,62 @@ namespace pilot_test
             // +++  I can NOT resolve the measured value with actual reality :(
             Trace.WriteLine("::Geom_Click");
             // new: ticks per meter, motormax ticks per second 
-            Pilot.Send(new { Cmd = "Config", Geom = new float[] { 336.2F,  450F } });
+            Pilot.Send(new { Cmd = "CONFIG", Geom = new float[] { 336.2F,  450 } });
         }
 
         [UiButton("Cali")]
         public void Cali_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Cali_Click");
-            Pilot.Send(new { Cmd = "Config" , MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
+            Pilot.Send(new { Cmd = "CONFIG", MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
         }
 
         public void Power_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Power_Click");
-            Pilot.Send(new { Cmd = "Pwr", M1 = MotorPower, M2 = MotorPower });
+            Pilot.Send(new { Cmd = "PWR", M1 = MotorPower, M2 = MotorPower });
         }
 
         [UiButton("HB Off")]
         public void HbOff_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Button_HbOff");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 0, Int = 1000/1 });
+            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 1 });
         }
 
         [UiButton("HB fast")]
         public void HbFast_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbFast_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000/20 });
+            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 20 });
         }
 
         [UiButton("HB slow")]
         public void HbSlow_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::HbSlow_Click");
-            Pilot.Send(new { Cmd = "Heartbeat", Value = 1, Int = 1000 / 1 });
+            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 1 });
         }
 
-        [UiButton("Wait")]
-        public void Wait_Click(object sender, RoutedEventArgs e)
+        [UiButton("ROTA in place")]
+        public void Rotate_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Wait_Click");
-            Pilot.Send(new { Cmd = "Wait", Pwr = 40.0 });
+            Trace.WriteLine("::Rotate_Click");
+            Pilot.Send(new { Cmd = "ROTA", Hdg = 30 });
+        }
+
+        [UiButton("Dist Hold")]
+        public void DistHold_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::DistHold_Click");
+            Pilot.Send(new { Cmd = "PWR", M1 = 40.0, M2 = 40.0, Dist = 2.0 });
         }
 
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)
         {
             float p = (float)source.GetValue(MotorPowerProperty);
             Trace.WriteLine($"New power={p}", "3");            
-            _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "Pwr", M1 = p, M2 = p }); } );
+            _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "PWR", M1 = p, M2 = p }); } );
         }
 
         private void ReceivedEvent(dynamic j)
@@ -461,9 +468,8 @@ namespace pilot_test
 
         private void Power0_Click(object sender, RoutedEventArgs e)
         {
-            Pilot.Send(new { Cmd = "Pwr", M1 = 0, M2 = 0 });
+            Pilot.Send(new { Cmd = "PWR", M1 = 0, M2 = 0 });
         }
-
     }
 
     [AttributeUsage(AttributeTargets.Method)]
