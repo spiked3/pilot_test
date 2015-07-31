@@ -328,7 +328,7 @@ namespace pilot_test
             Trace.WriteLine("::ToggleButton_Serial");
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("com15");
+                Pilot = Pilot.Factory("com7");
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
