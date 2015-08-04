@@ -298,7 +298,7 @@ namespace pilot_test
         {
             if (p.Left != lastJoyM1 || p.Right != lastJoyM2)
             {
-                Pilot.Send(new { Cmd = "Pwr", M1 = p.Left, M2 = p.Right });
+                Pilot.Send(new { Cmd = "MOV", M1 = p.Left, M2 = p.Right });
                 lastJoyM1 = p.Left;
                 lastJoyM2 = p.Right;
             }
@@ -404,28 +404,7 @@ namespace pilot_test
         public void Power_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Power_Click");
-            Pilot.Send(new { Cmd = "PWR", M1 = MotorPower, M2 = MotorPower });
-        }
-
-        [UiButton("HB Off")]
-        public void HbOff_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Button_HbOff");
-            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 1 });
-        }
-
-        [UiButton("HB fast")]
-        public void HbFast_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::HbFast_Click");
-            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 20 });
-        }
-
-        [UiButton("HB slow")]
-        public void HbSlow_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::HbSlow_Click");
-            Pilot.Send(new { Cmd = "CONFIG", HB = 1000 / 1 });
+            Pilot.Send(new { Cmd = "MOV", M1 = MotorPower, M2 = MotorPower });
         }
 
         [UiButton("ROTA in place")]
@@ -439,14 +418,14 @@ namespace pilot_test
         public void DistHold_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::DistHold_Click");
-            Pilot.Send(new { Cmd = "PWR", M1 = 40.0, M2 = 40.0, Dist = 2.0 });
+            Pilot.Send(new { Cmd = "MOV", M1 = 40.0, M2 = 40.0, Dist = 2.0 });
         }
 
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)
         {
             float p = (float)source.GetValue(MotorPowerProperty);
             Trace.WriteLine($"New power={p}", "3");            
-            _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "PWR", M1 = p, M2 = p }); } );
+            _theInstance.Dispatcher.Invoke(()=> { _theInstance.Pilot.Send(new { Cmd = "MOV", M1 = p, M2 = p }); } );
         }
 
         private void ReceivedEvent(dynamic j)
@@ -468,7 +447,7 @@ namespace pilot_test
 
         private void Power0_Click(object sender, RoutedEventArgs e)
         {
-            Pilot.Send(new { Cmd = "PWR", M1 = 0, M2 = 0 });
+            Pilot.Send(new { Cmd = "MOV", M1 = 0, M2 = 0 });
         }
     }
 
