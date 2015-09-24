@@ -163,7 +163,7 @@ namespace pilot_test
             HdgPid.Kp = Settings.Default.HdgKp;
             HdgPid.Ki = Settings.Default.HdgKi;
             HdgPid.Kd = Settings.Default.HdgKd;
-
+            
             InitializeComponent();
 
             motorPid1.Click += mototPid1_Click;
@@ -380,7 +380,6 @@ namespace pilot_test
 
         public void mototPid1_Click(object sender, EventArgs e)
         {
-            // critical you include the decimal point (json decoding rqmt) (use data type float)
             Trace.WriteLine("::mototPid1_Click");
             Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
         }
@@ -411,7 +410,7 @@ namespace pilot_test
         public void Rotate_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Rotate_Click");
-            Pilot.Send(new { Cmd = "ROTA", Hdg = 30 });
+            Pilot.Send(new { Cmd = "ROTA", Hdg = 30.0 });
         }
 
         [UiButton("Dist Hold")]
