@@ -238,8 +238,6 @@ namespace pilot_test
                     CommandList.Add(b);
                 }
             }
-
-            Joy1.JoystickMovedListeners += GamepadHandler;
         }
 
         private void Pilot_OnReceive(dynamic json)
@@ -258,7 +256,7 @@ namespace pilot_test
                 case "Motors":
                     Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); oxy2Model.Append(json); oxy2.InvalidatePlot(); });
                     break;
-                case "HdgPid":
+                case "Heading":
                     Dispatcher.InvokeAsync(() => { oxy3Model.Append(json); oxy3.InvalidatePlot(); });
                     break;
                 case "Heartbeat":                    
@@ -400,24 +398,31 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "CONFIG", MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
         }
 
+        [UiButton("ROTA 180.0")]
+        public void RotaTest_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::RotaTest_Click");
+            Pilot.Send(new { Cmd = "ROTA", Hdg = H + 180.0F, Pwr = 80.0 });
+        }
+
+        [UiButton("MOV 3.0")]
+        public void MovTest_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::MovTest_Click");
+            Pilot.Send(new { Cmd = "MOV", Dist = 3.0F, Pwr = 40.0F });
+        }
+
+        [UiButton("GOTO 0,0")]
+        public void GotoZero_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::GotoZero_Click");
+            Pilot.Send(new { Cmd = "GOTOXY", X = 0F, Y = 0F, Pwr = 40.0F });
+        }
+
         public void Power_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Power_Click");
             Pilot.Send(new { Cmd = "MOV", M1 = MotorPower, M2 = MotorPower });
-        }
-
-        [UiButton("ROTA in place")]
-        public void Rotate_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Rotate_Click");
-            Pilot.Send(new { Cmd = "ROTA", Hdg = 30.0 });
-        }
-
-        [UiButton("Dist Hold")]
-        public void DistHold_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::DistHold_Click");
-            Pilot.Send(new { Cmd = "MOV", M1 = 40.0, M2 = 40.0, Dist = 2.0 });
         }
 
         static void OnMotorPowerChanged(DependencyObject source, DependencyPropertyChangedEventArgs ea)
@@ -433,16 +438,6 @@ namespace pilot_test
             string e = j["Event"];
             Trace.WriteLine($"Received Event ({e}) Value ({i})");
         }
-
-        //private float constrain(float v, int mi, int ma)
-        //{
-        //    return Math.Max(Math.Min(ma, v), mi);
-        //}
-
-        //static float distance(float startX, float x, float startY, float y)
-        //{
-        //    return (float)(Math.Sqrt((x - startX) * (x - startX) + (y - startY) * (y - startY)));
-        //}
 
         private void Power0_Click(object sender, RoutedEventArgs e)
         {

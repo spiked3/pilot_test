@@ -32,10 +32,6 @@
         </StatusBar>
 
         <Grid x:Name="mainGrid" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="209*"/>
-                <ColumnDefinition Width="69*"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="3*" />
@@ -43,7 +39,7 @@
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
 
-            <ListBox ItemsSource="{Binding CommandList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="0"  >
+            <ListBox ItemsSource="{Binding CommandList}" Grid.Row="0"  >
                 <ListBox.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Width" Value="78" />
@@ -63,19 +59,11 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <spiked3:JoystickControl x:Name="Joy1" Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
-
             <TabControl  Grid.Row="1" Grid.ColumnSpan="2">
                 <TabItem Header="Motor" >
-                    <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <!--<System:String xml:space="preserve">&gt; </System:String>-->
+                    <StackPanel Orientation="Horizontal" >
 
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" >
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" Width="320">
                             <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" 
 								Foreground="White" Background="Red" Click="Power0_Click" />
                             <StackPanel Orientation="Horizontal" Margin="4" >
@@ -83,27 +71,19 @@
                                 <TextBox Text="{Binding MotorPower, Delay=500, UpdateSourceTrigger=PropertyChanged}" />
                                 <Button Style="{StaticResource sendButton}" Click="Power_Click" Foreground="White" Background="DarkGray"/>
                                 <Border BorderThickness="1" BorderBrush="Black" Margin="8,0" >
-                                    <Label Content="Caution: Automatic send on change" Background="Yellow" />
+                                    <Label Content="Caution - Automatic" Background="Yellow" />
                                 </Border>
                             </StackPanel>
-
-                            <!--<StackPanel Orientation="Horizontal" Margin="4" >
-                                <Label Content="MoveD" />
-                                <TextBox Text="{Binding MoveD}" />
-                                <Label Content="MovePwr" />
-                                <TextBox Text="{Binding MovePwr}" />
-                                <Button Style="{StaticResource sendButton}" Foreground="White" Background="DarkGray"/>
-                            </StackPanel>-->
 
                             <local:PidPanel x:Name="motorPid1" DataContext="{Binding MotorPid}" Margin="8" />
                         </StackPanel>
 
                         <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
 
-                        <Oxy:PlotView x:Name="oxy1" Model="{Binding oxy1Model}" Width="640" Margin="4,2" Height="480" />
-                        <Oxy:PlotView x:Name="oxy2" Model="{Binding oxy2Model}" Width="640" Margin="4,2" Height="480" />
+                        <Oxy:PlotView x:Name="oxy1" Model="{Binding oxy1Model}" Width="320" Margin="4,2" Height="480" />
+                        <Oxy:PlotView x:Name="oxy2" Model="{Binding oxy2Model}" Width="320" Margin="4,2" Height="480" />
 
-                    </ListBox>
+                    </StackPanel>
                 </TabItem>
                 <TabItem Header="Steering" >
                     <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
