@@ -77,8 +77,16 @@ namespace pilot_test
                     //else if (j.StartsWith("//"))
                     //    Trace.WriteLine(j.Trim() + "\r\n", "+");
                     //else
-                    if (OnPilotReceive != null)
-                        OnPilotReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
+                    try
+                    {
+                        if (OnPilotReceive != null)
+                            OnPilotReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
+                    }
+                    catch (Exception)
+                    {
+                        Trace.WriteLine($"exception on {Encoding.UTF8.GetString(e.Message)}");
+                    }
+
                     break;
             }
         }
