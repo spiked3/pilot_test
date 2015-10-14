@@ -425,6 +425,26 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "GOTO", X = 0F, Y = 0F, Pwr = 40.0F });
         }
 
+        [UiButton("rotate +90")]
+        public void rotPlus90(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine($"rotate +90");
+            Pilot.Send(new { Cmd = "ROTA", Hdg = H + 90.0F, Pwr = 40.0F });
+        }
+
+        [UiButton("rotate -90")]
+        public void rotMinus90(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("rotate -90");
+            Pilot.Send(new { Cmd = "ROTA", Hdg = H - 90.0F, Pwr = 40.0F });
+        }
+        [UiButton("GOTO 2")]
+        public void GotoTwo_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::GotoZero_Click");
+            Pilot.Send(new { Cmd = "GOTOXY", X = 0F, Y = 0F, Pwr = 40.0F });
+        }
+
         public void Power_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::Power_Click");
