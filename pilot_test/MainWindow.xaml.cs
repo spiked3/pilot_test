@@ -22,6 +22,8 @@ using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using NDesk.Options;
 
+// todo open separate oxyplot window if/when received telemetry (and elliminate it from UI)
+
 // DoEvents:  Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { }));
 
 namespace pilot_test
@@ -240,47 +242,49 @@ namespace pilot_test
             }
         }
 
-        private void Pilot_OnReceive(dynamic json)
+        private void Pilot_OnReceive(dynamic j)
         {
             Dispatcher.InvokeAsync(() =>
             {
-                string t = JsonConvert.SerializeObject(json);
+                string t = JsonConvert.SerializeObject(j);
                 Trace.WriteLine(t, "5");
             });
 
-            switch ((string)(json["T"]))
+            switch ((string)(j.T))
             {
                 case "Log":
-                    Dispatcher.InvokeAsync(() => { RecieveLog(json); });
+                case "Error":
+                case "Debug":
+                    Dispatcher.InvokeAsync(() => { RecieveLog(j); });
                     break;
                 case "Motors":
-                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(json); oxy1.InvalidatePlot(); oxy2Model.Append(json); oxy2.InvalidatePlot(); });
+                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(j); oxy1.InvalidatePlot(); oxy2Model.Append(j); oxy2.InvalidatePlot(); });
                     break;
                 case "Heading":
-                    Dispatcher.InvokeAsync(() => { oxy3Model.Append(json); oxy3.InvalidatePlot(); });
-                    break;
-                case "Heartbeat":                    
+                    Dispatcher.InvokeAsync(() => { oxy3Model.Append(j); oxy3.InvalidatePlot(); });
                     break;
                 case "Pose":
-                    Dispatcher.InvokeAsync(() => { ReceivedPose(json); });
+                    Dispatcher.InvokeAsync(() => { ReceivedPose(j); });
                     break;
-                case "Event":
-                    Dispatcher.InvokeAsync(() => { ReceivedEvent(json); });
+                case "Move":
+                case "Rotate":
+                case "Bumper":
+                    Dispatcher.InvokeAsync(() => { ReceivedEvent(j); });
                     break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 
-        private void RecieveLog(dynamic json)
+        private void RecieveLog(dynamic j)
         {
-            // if msg starts with E log as error
-            bool isError = false;
-            string t = json["Msg"];
-            if (t.StartsWith("E"))
-            {
-                isError = true;
-                t = t.Substring(1);
-            }
-            Trace.WriteLine(t, isError ? "error" : "+");
+            bool isError = j.T == "Error";
+            bool isDebug = j.T == "Debug";
+            string payload = j.V;
+            if (!isDebug)
+                Trace.WriteLine(payload, isError ? "error" : "+");
+            else
+                ; // Trace.WriteLine(j, "2");
         }
 
         private void ReceivedPose(dynamic j)
@@ -288,18 +292,6 @@ namespace pilot_test
             X = j.X;
             Y = j.Y;
             H = j.H;
-        }
-
-        double lastJoyM1, lastJoyM2;
-
-        private void GamepadHandler(rChordata.DiamondPoint p)
-        {
-            if (p.Left != lastJoyM1 || p.Right != lastJoyM2)
-            {
-                Pilot.Send(new { Cmd = "MOV", M1 = p.Left, M2 = p.Right });
-                lastJoyM1 = p.Left;
-                lastJoyM2 = p.Right;
-            }
         }
 
         void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -398,11 +390,25 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "CONFIG", MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
         }
 
-        [UiButton("ROTA 180.0")]
+        [UiButton("ROT 180.0")]
         public void RotaTest_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::RotaTest_Click");
-            Pilot.Send(new { Cmd = "ROTA", Hdg = H + 180.0F, Pwr = 80.0 });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = 80.0 });
+        }
+
+        [UiButton("ROT +30")]
+        public void RotPlus30_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::RotPlus30_Click");
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 30.0F, Pwr = 80.0 });
+        }
+
+        [UiButton("ROT -30")]
+        public void RotMinus30_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("::RotMinus30_Click");
+            Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = 80.0 });
         }
 
         [UiButton("MOV 3.0")]
@@ -416,7 +422,7 @@ namespace pilot_test
         public void GotoZero_Click(object sender, RoutedEventArgs e)
         {
             Trace.WriteLine("::GotoZero_Click");
-            Pilot.Send(new { Cmd = "GOTOXY", X = 0F, Y = 0F, Pwr = 40.0F });
+            Pilot.Send(new { Cmd = "GOTO", X = 0F, Y = 0F, Pwr = 40.0F });
         }
 
         public void Power_Click(object sender, RoutedEventArgs e)
@@ -434,9 +440,9 @@ namespace pilot_test
 
         private void ReceivedEvent(dynamic j)
         {
-            int i = j["Value"];
-            string e = j["Event"];
-            Trace.WriteLine($"Received Event ({e}) Value ({i})");
+            int val = j["V"];
+            string ev = j["T"];
+            Trace.WriteLine($"Received Event ({ev}) Value ({val})");
         }
 
         private void Power0_Click(object sender, RoutedEventArgs e)

@@ -13,13 +13,16 @@ using System.Windows.Threading;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
+
+// todo this is intended to be THE library driver for pilot, Mono, native, serial or MQTT
+//  todo expand it as such
 namespace pilot_test
 {
     public class Pilot
     {
         MqttClient Mq;
         private PilotSerial Serial;
-
+        static float X, Y, H;
 
         public string CommStatus { get; internal set; }
 
@@ -28,12 +31,11 @@ namespace pilot_test
 
         public static Pilot Factory(string uri)     // not really a uri, yet
         {
-            // +++ ideally verify serial port is a pilot
-
             Pilot p = new Pilot();
 
             if (uri.Contains("com"))
                 p.SerialOpen(uri);
+                // todo ideally verify serial port is a pilot
             else
                 p.MqttOpen(uri);
 
@@ -44,11 +46,29 @@ namespace pilot_test
                 b.Append($"Mqtt ({uri}) connected");
             p.CommStatus = b.ToString();
 
+            p.OnPilotReceive += p.Internal_OnPilotReceive;
+
             return p;
         }
 
-        private Pilot()
-        { }
+        void Internal_OnPilotReceive(dynamic j)
+        {
+            //Console.WriteLine(j);
+            switch ((string)(j.T))
+            {
+                case "Pose":
+                    X = j.X;
+                    Y = j.Y;
+                    H = j.H;
+                    break;
+
+                case "Event":
+                case "Move":
+                case "Rotate":
+                    simpleEventFlag = true;
+                    break;
+            }
+        }
 
         void MqttOpen(string c)
         {
@@ -58,7 +78,7 @@ namespace pilot_test
             {                
                 Mq.Connect("pTest");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -71,14 +91,9 @@ namespace pilot_test
             switch (e.Topic)
             {
                 case "robot1":
-                    string j = System.Text.Encoding.UTF8.GetString(e.Message);
-                    //if (j.StartsWith("//!"))
-                    //    Trace.WriteLine(j.Trim() + "\r\n", "error");
-                    //else if (j.StartsWith("//"))
-                    //    Trace.WriteLine(j.Trim() + "\r\n", "+");
-                    //else
+                    string j = Encoding.UTF8.GetString(e.Message);
                     if (OnPilotReceive != null)
-                        OnPilotReceive(JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(e.Message)));
+                        OnPilotReceive(JsonConvert.DeserializeObject(j));
                     break;
             }
         }
@@ -95,7 +110,6 @@ namespace pilot_test
                 Serial.Close();
             Trace.WriteLine("Serial closed", "3");
         }
-
 
         private void SerialOpen(string c)
         {
@@ -144,6 +158,30 @@ namespace pilot_test
                 Serial.Close();
             if (Mq?.IsConnected ?? false)
                 MqttClose();
+        }
+
+        TimeSpan waitTimeOut = new TimeSpan(0, 0, 0, 45);		// time out in seconds
+        bool simpleEventFlag;
+
+        public bool waitForEvent()
+        {
+            return waitForEvent(waitTimeOut);
+        }
+
+        public bool waitForEvent(TimeSpan timeOut)
+        {
+            simpleEventFlag = false;
+            DateTime timeOutAt = DateTime.Now + timeOut;
+            while (!simpleEventFlag)
+            {
+                System.Threading.Thread.Sleep(100);
+                if (DateTime.Now > timeOutAt)
+                {
+                    Send(new { Cmd = "ESC", Value = 0 });
+                    throw new TimeoutException("TimeOut waiting for event");
+                }
+            }
+            return true;
         }
     }
 }
