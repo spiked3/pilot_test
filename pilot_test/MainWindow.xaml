@@ -33,7 +33,7 @@
 
         <Grid x:Name="mainGrid" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
+                <RowDefinition Height="84" />
                 <RowDefinition Height="3*" />
                 <RowDefinition Height="4" />
                 <RowDefinition Height="2*" />
@@ -59,55 +59,44 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <TabControl  Grid.Row="1" Grid.ColumnSpan="2">
-                <TabItem Header="Motor" >
-                    <StackPanel Orientation="Horizontal" >
 
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" Width="320">
-                            <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" 
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TabControl Grid.Column="0" >
+                    <TabItem Header="Motor" >
+                        <StackPanel Orientation="Horizontal" >
+
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Top" Width="320">
+                                <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" 
 								Foreground="White" Background="Red" Click="Power0_Click" />
-                            <StackPanel Orientation="Horizontal" Margin="4" >
-                                <Label Content="Pwr" />
-                                <TextBox Text="{Binding MotorPower, Delay=500, UpdateSourceTrigger=PropertyChanged}" />
-                                <Button Style="{StaticResource sendButton}" Click="Power_Click" Foreground="White" Background="DarkGray"/>
-                                <Border BorderThickness="1" BorderBrush="Black" Margin="8,0" >
-                                    <Label Content="Caution - Automatic" Background="Yellow" />
-                                </Border>
+                                <StackPanel Orientation="Horizontal" Margin="4" >
+                                    <Label Content="Pwr" />
+                                    <TextBox Text="{Binding MotorPower, Delay=500, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Style="{StaticResource sendButton}" Click="Power_Click" Foreground="White" Background="DarkGray"/>
+                                    <Border BorderThickness="1" BorderBrush="Black" Margin="8,0" >
+                                        <Label Content="Caution - Automatic" Background="Yellow" />
+                                    </Border>
+                                </StackPanel>
+                                <local:PidPanel x:Name="motorPid1" DataContext="{Binding MotorPid}" Margin="8" />
                             </StackPanel>
-
-                            <local:PidPanel x:Name="motorPid1" DataContext="{Binding MotorPid}" Margin="8" />
                         </StackPanel>
-
-                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
-
-                        <Oxy:PlotView x:Name="oxy1" Model="{Binding oxy1Model}" Width="320" Margin="4,2" Height="480" />
-                        <Oxy:PlotView x:Name="oxy2" Model="{Binding oxy2Model}" Width="320" Margin="4,2" Height="480" />
-
-                    </StackPanel>
-                </TabItem>
-                <TabItem Header="Steering" >
-                    <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <System:String xml:space="preserve">&gt; </System:String>
-
+                    </TabItem>
+                    <TabItem Header="Steering" >
                         <StackPanel Orientation="Vertical" VerticalAlignment="Top" >
                             <Button Content="pwr 0" Style="{StaticResource sendButton}" HorizontalAlignment="Left" Margin="4,2" 
 								Foreground="White" Background="Red" Click="Power0_Click" />
 
                             <local:PidPanel x:Name="hdgPid1" DataContext="{Binding HdgPid}"  Margin="8" />
                         </StackPanel>
+                    </TabItem>
+                </TabControl>
 
-                        <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                <Oxy:PlotView Grid.Column="1" x:Name="oxy1" Model="{Binding oxy1Model}" Margin="4,2" />
 
-                        <Oxy:PlotView x:Name="oxy3" Model="{Binding oxy3Model}" Width="640" Margin="4,2" Height="480" />
-
-                    </ListBox>
-                </TabItem>
-            </TabControl>
+            </Grid>
 
             <GridSplitter x:Name="splitter1" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" d:IsLocked="True" />
 

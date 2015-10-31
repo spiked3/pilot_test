@@ -95,28 +95,7 @@ namespace pilot_test
         }
         public static readonly DependencyProperty oxy1ModelProperty =
             DependencyProperty.Register("oxy1Model", typeof(OxyPilot), typeof(MainWindow),
-                new PropertyMetadata(new OxyPilot(new[] { "T1", "V1", "I1", "D1", "PW1" })
-                { LegendBorder = OxyColors.Black }));
-
-        public OxyPilot oxy2Model
-        {
-            get { return (OxyPilot)GetValue(oxy2ModelProperty); }
-            set { SetValue(oxy2ModelProperty, value); }
-        }
-        public static readonly DependencyProperty oxy2ModelProperty =
-            DependencyProperty.Register("oxy2Model", typeof(OxyPilot), typeof(MainWindow),
-                new PropertyMetadata(new OxyPilot(new[] { "T2", "V2", "I2", "D2", "PW2" })
-                { LegendBorder = OxyColors.Black }));
-
-        public OxyPilot oxy3Model
-        {
-            get { return (OxyPilot)GetValue(oxy3ModelProperty); }
-            set { SetValue(oxy3ModelProperty, value); }
-        }
-        public static readonly DependencyProperty oxy3ModelProperty =
-            DependencyProperty.Register("oxy3Model", typeof(OxyPilot), typeof(MainWindow),
-                new PropertyMetadata(new OxyPilot(new[] { "Error", "Adjustment", "Integral", "Derivative", "PrevError" })
-                { LegendBorder = OxyColors.Black }));
+                new PropertyMetadata(new OxyPilot() { LegendBorder = OxyColors.Black }));
 
         public float TurnH
         {
@@ -257,11 +236,8 @@ namespace pilot_test
                 case "Debug":
                     Dispatcher.InvokeAsync(() => { RecieveLog(j); });
                     break;
-                case "Motors":
-                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(j); oxy1.InvalidatePlot(); oxy2Model.Append(j); oxy2.InvalidatePlot(); });
-                    break;
-                case "Heading":
-                    Dispatcher.InvokeAsync(() => { oxy3Model.Append(j); oxy3.InvalidatePlot(); });
+                case "Telemetry":
+                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(j); oxy1.InvalidatePlot(); });
                     break;
                 case "Pose":
                     Dispatcher.InvokeAsync(() => { ReceivedPose(j); });
@@ -271,8 +247,8 @@ namespace pilot_test
                 case "Bumper":
                     Dispatcher.InvokeAsync(() => { ReceivedEvent(j); });
                     break;
-                default:
-                    throw new NotImplementedException();
+                //default:
+                    //throw new NotImplementedException();
             }
         }
 
@@ -310,15 +286,20 @@ namespace pilot_test
             Close();
         }
 
+        void _T([CallerMemberName] String T = "")
+        {
+            Trace.WriteLine("::" + T);
+        }
+
         // ---------------------- commands
 
         [UiButton("Serial", "Black", "White", isToggle = true)]
         public void ToggleButton_Serial(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::ToggleButton_Serial");
+            //_T();
             if ((sender as ToggleButton).IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("com7");
+                Pilot = Pilot.Factory("com15");
                 Pilot.OnPilotReceive += Pilot_OnReceive;
                 CommStatus = Pilot.CommStatus;
             }
@@ -332,7 +313,7 @@ namespace pilot_test
         [UiButton("MQTT", "Black", "White", isToggle = true)]
         public void ToggleButton_MQTT(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::ToggleButton_MQTT");
+            //_T();
             if ((sender as ToggleButton).IsChecked ?? false)
             {
                 Pilot = Pilot.Factory(mqttBroker);
@@ -349,7 +330,7 @@ namespace pilot_test
         [UiButton("Esc", "Black", "White", isToggle = true)]
         public void ToggleButton_Esc(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::ToggleButton_Esc");
+            _T();
             int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
             Pilot.Send(new { Cmd = "ESC", Value = OnOff });
         }
@@ -357,97 +338,78 @@ namespace pilot_test
         [UiButton("Reset", "Black", "Yellow")]
         public void ResetPose_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Button_ResetPose");
+            _T();
             Pilot.Send(new { Cmd = "RESET" });
             X = Y = H = 0f;
         }
 
         private void hdgPid1_Click(object sender, EventArgs e)
         {
-            Trace.WriteLine("::hdgPid1_Click");
+            _T();
             Pilot.Send(new { Cmd = "CONFIG", hPID = new float[] { HdgPid.Kp, HdgPid.Ki, HdgPid.Kd } });
         }
 
         public void mototPid1_Click(object sender, EventArgs e)
         {
-            Trace.WriteLine("::mototPid1_Click");
+            _T();
             Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
         }
 
-        [UiButton("Geom")]
-        public void Geom_Click(object sender, RoutedEventArgs e)
+        [UiButton("Config")]
+        public void Config_Click(object sender, RoutedEventArgs e)
         {
-            // +++  I can NOT resolve the measured value with actual reality :(
-            Trace.WriteLine("::Geom_Click");
-            // new: ticks per meter, motormax ticks per second 
-            Pilot.Send(new { Cmd = "CONFIG", Geom = new float[] { 336.2F,  450 } });
-        }
-
-        [UiButton("Cali")]
-        public void Cali_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::Cali_Click");
-            Pilot.Send(new { Cmd = "CONFIG", MPU = new float[] { -333, -3632, 2311, -1062, 28, -11 } });
+            _T();
+            Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
+            Pilot.Send(new { Cmd = "CONFIG", Geom = new float[] { 336.2F, 450F } });
+            Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
+            Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { 0.8F, 0.9F, 0.004F } });
         }
 
         [UiButton("ROT 180.0")]
         public void RotaTest_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::RotaTest_Click");
+            _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = 80.0 });
         }
 
-        [UiButton("ROT +30")]
-        public void RotPlus30_Click(object sender, RoutedEventArgs e)
+        [UiButton("ROT +10")]
+        public void RotPlus10_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::RotPlus30_Click");
-            Pilot.Send(new { Cmd = "ROT", Hdg = H + 30.0F, Pwr = 80.0 });
+            _T();
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 10.0F, Pwr = 80.0 });
         }
 
         [UiButton("ROT -30")]
         public void RotMinus30_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::RotMinus30_Click");
+            _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = 80.0 });
         }
 
-        [UiButton("MOV 3.0")]
+        [UiButton("MOV 1.0")]
         public void MovTest_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::MovTest_Click");
-            Pilot.Send(new { Cmd = "MOV", Dist = 3.0F, Pwr = 40.0F });
-        }
-
-        [UiButton("GOTO 0,0")]
-        public void GotoZero_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::GotoZero_Click");
-            Pilot.Send(new { Cmd = "GOTO", X = 0F, Y = 0F, Pwr = 40.0F });
+            _T();
+            Pilot.Send(new { Cmd = "MOV", Dist = 1.0F, Pwr = 40.0F });
         }
 
         [UiButton("rotate +90")]
         public void rotPlus90(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine($"rotate +90");
+            _T();
             Pilot.Send(new { Cmd = "ROTA", Hdg = H + 90.0F, Pwr = 40.0F });
         }
 
         [UiButton("rotate -90")]
         public void rotMinus90(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("rotate -90");
+            _T();
             Pilot.Send(new { Cmd = "ROTA", Hdg = H - 90.0F, Pwr = 40.0F });
-        }
-        [UiButton("GOTO 2")]
-        public void GotoTwo_Click(object sender, RoutedEventArgs e)
-        {
-            Trace.WriteLine("::GotoZero_Click");
-            Pilot.Send(new { Cmd = "GOTOXY", X = 0F, Y = 0F, Pwr = 40.0F });
         }
 
         public void Power_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("::Power_Click");
+            _T();
             Pilot.Send(new { Cmd = "MOV", M1 = MotorPower, M2 = MotorPower });
         }
 
@@ -460,13 +422,12 @@ namespace pilot_test
 
         private void ReceivedEvent(dynamic j)
         {
-            int val = j["V"];
-            string ev = j["T"];
-            Trace.WriteLine($"Received Event ({ev}) Value ({val})");
+            Trace.WriteLine($"Received Event ({j["T"]}) Value ({j["V"]})");
         }
 
         private void Power0_Click(object sender, RoutedEventArgs e)
         {
+            _T();
             Pilot.Send(new { Cmd = "MOV", M1 = 0, M2 = 0 });
         }
     }

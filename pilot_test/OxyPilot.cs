@@ -14,25 +14,28 @@ namespace pilot_test
     {
         const int pointLimit = 100;
 
-        public OxyPilot(string[] keys)
+        public OxyPilot()
         {
             Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
             Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            foreach (string k in keys)
-                Series.Add(new LineSeries { Title = k });
+            //foreach (string k in keys)
+            //    Series.Add(new LineSeries { Title = k });
         }
 
         //Dictionary<string, LineSeries> SeriesDict = new Dictionary<string, LineSeries>();
 
         public void Append(dynamic j)
         {
+            // todo probably should eventually get time from pilot (but remember to ignore from GetMemberNames)
             var t = DateTimeAxis.ToDouble(DateTime.Now);
 
-            // +++ if we have not seen it before, add it to the plot
-            //foreach (string k in j.Keys)
-            //{}
-
-            //LineSeries s = SeriesDict[??];
+            // the first message (with data) sets the keys to plot
+            if (Series.Count == 0)
+            {
+                var m = Util.GetMemberNames(j, true);
+                foreach (string k in m)
+                    Series.Add(new LineSeries { Title = k });
+            }
 
             foreach (LineSeries ls in Series)
             { 
