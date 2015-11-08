@@ -53,7 +53,8 @@ namespace pilot_test
 
         void Internal_OnPilotReceive(dynamic j)
         {
-            //Console.WriteLine(j);
+            if (simpleEventFlag)
+                Console.WriteLine("during wait:" + j);
             switch ((string)(j.T))
             {
                 case "Pose":
@@ -178,7 +179,8 @@ namespace pilot_test
                 if (DateTime.Now > timeOutAt)
                 {
                     Send(new { Cmd = "ESC", Value = 0 });
-                    throw new TimeoutException("TimeOut waiting for event");
+                    Trace.WriteLine("TimeOut waiting for event");
+                    Application.Current.Shutdown(16);
                 }
             }
             return true;

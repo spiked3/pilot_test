@@ -29,24 +29,30 @@ namespace pilot_test
         [UiButton("NavPlanTest")]
         public void CurrentTest(object sender, RoutedEventArgs e)
         {
-            //Pilot = Pilot.Factory("192.168.42.1");
+            Pilot = Pilot.Factory("192.168.42.1");
             //Pilot = Pilot.Factory("127.0.0.1");
-            Pilot = Pilot.Factory("com15");
+            //Pilot = Pilot.Factory("com15");
             Pilot.OnPilotReceive += Pilot_OnReceive;
+
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", Geom = new float[] { 336.2F, 450F } });
+            Pilot.Send(new { Cmd = "CONFIG", TPM = 336, MMX = 450, StrRv = -1 });
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
-            Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { 0.5F, 0.4F, 0.004F } });
+            //Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { 0.5F, 0.4F, 0.004F } });
+
             Pilot.Send(new { Cmd = "RESET"});
             Pilot.Send(new { Cmd = "ESC", Value = 1 });
+
+
             Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
             Pilot.waitForEvent();
-            Pilot.Send(new { Cmd = "ROTA", Hdg = 10.0 });
+            Pilot.Send(new { Cmd = "ROT", Hdg = 180.0 });
             Pilot.waitForEvent();
-            //Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
-            //Pilot.waitForEvent();
-            //Pilot.Send(new { Cmd = "ROTA", Hdg = 0.0 });
-            //Pilot.waitForEvent();
+            Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Hdg = 180.0, Pwr = 40.0F });
+            Pilot.waitForEvent();
+            Pilot.Send(new { Cmd = "ROT", Hdg = 0.0 });
+            Pilot.waitForEvent();
+
+
             Pilot.Send(new { Cmd = "ESC", Value = 0 });
         }
     }

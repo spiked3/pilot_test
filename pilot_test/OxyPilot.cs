@@ -12,28 +12,23 @@ namespace pilot_test
 {
     public class OxyPilot : PlotModel
     {
-        const int pointLimit = 100;
+        const int pointLimit = 150;
 
         public OxyPilot()
         {
             Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
             Axes.Add(new OxyPlot.Axes.LinearAxis { });
-            //foreach (string k in keys)
-            //    Series.Add(new LineSeries { Title = k });
         }
-
-        //Dictionary<string, LineSeries> SeriesDict = new Dictionary<string, LineSeries>();
 
         public void Append(dynamic j)
         {
-            // todo probably should eventually get time from pilot (but remember to ignore from GetMemberNames)
-            var t = DateTimeAxis.ToDouble(DateTime.Now);
-
             // the first message (with data) sets the keys to plot
             if (Series.Count == 0)
             {
-                var m = Util.GetMemberNames(j, true);
-                foreach (string k in m)
+                List<string> keys = Util.GetMemberNames(j, true);
+                keys.Remove("T");
+                keys.Remove("Time");
+                foreach (string k in keys)
                     Series.Add(new LineSeries { Title = k });
             }
 
@@ -43,14 +38,14 @@ namespace pilot_test
                     ls.Points.RemoveAt(0);
                 try
                 {
-                    ls.Points.Add( new DataPoint(t, (float)j[ls.Title])) ;
+                    ls.Points.Add(new DataPoint((double)j.Time, (double)j[ls.Title])) ;
                 }
                 catch (Exception)
                 {
-                    //System.Diagnostics.Debugger.Break();
+                    System.Diagnostics.Debugger.Break();
                 }
             }
-            // +++ would be nice if we could invalidate plot that we are attached to here            
+            // todo would be nice if we could invalidate plot that we are attached to here            
         }
     }
 }

@@ -340,7 +340,7 @@ namespace pilot_test
         {
             _T();
             Pilot.Send(new { Cmd = "RESET" });
-            X = Y = H = 0f;
+            // we should rcv a pose            
         }
 
         private void hdgPid1_Click(object sender, EventArgs e)
@@ -359,52 +359,53 @@ namespace pilot_test
         public void Config_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", Geom = new float[] { 336.2F, 450F } });
+            //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
+            Pilot.Send(new { Cmd = "CONFIG", TPM = 336, MMX = 450, StrRv = -1});
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
-            Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { 0.8F, 0.9F, 0.004F } });
         }
+
+        const float RotatePower = 50.0F, MovePower = 40.0F;
 
         [UiButton("ROT 180.0")]
         public void RotaTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = 80.0 });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = RotatePower });
         }
 
         [UiButton("ROT +10")]
         public void RotPlus10_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "ROT", Hdg = H + 10.0F, Pwr = 80.0 });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 10.0F, Pwr = RotatePower });
         }
 
         [UiButton("ROT -30")]
         public void RotMinus30_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = 80.0 });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = RotatePower });
         }
 
         [UiButton("MOV 1.0")]
         public void MovTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "MOV", Dist = 1.0F, Pwr = 40.0F });
+            Pilot.Send(new { Cmd = "MOV", Dist = 10.0F, Pwr = MovePower });
         }
 
         [UiButton("rotate +90")]
         public void rotPlus90(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "ROTA", Hdg = H + 90.0F, Pwr = 40.0F });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H + 90.0F, Pwr = RotatePower });
         }
 
         [UiButton("rotate -90")]
         public void rotMinus90(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "ROTA", Hdg = H - 90.0F, Pwr = 40.0F });
+            Pilot.Send(new { Cmd = "ROT", Hdg = H - 90.0F, Pwr = RotatePower });
         }
 
         public void Power_Click(object sender, RoutedEventArgs e)
@@ -422,7 +423,7 @@ namespace pilot_test
 
         private void ReceivedEvent(dynamic j)
         {
-            Trace.WriteLine($"Received Event ({j["T"]}) Value ({j["V"]})");
+            Trace.WriteLine($"Received Event ({j.T}) Value ({j.V})");
         }
 
         private void Power0_Click(object sender, RoutedEventArgs e)

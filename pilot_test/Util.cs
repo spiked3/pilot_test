@@ -14,15 +14,11 @@ namespace pilot_test
         {
             var tList = new List<string>();
             if (!dynamicOnly)
-            {
                 tList.AddRange(target.GetType().GetProperties().Select(it => it.Name));
-            }
 
             var tTarget = target as IDynamicMetaObjectProvider;
             if (tTarget != null)
-            {
                 tList.AddRange(tTarget.GetMetaObject(Expression.Constant(tTarget)).GetDynamicMemberNames());
-            }
             return tList;
         }
     }

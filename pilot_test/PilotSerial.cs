@@ -58,7 +58,10 @@ namespace pilot_test
                     recvbuf[recvIdx] = 0;
                     string line = Encoding.UTF8.GetString(recvbuf, 0, recvIdx).Trim(new char[] { '\r', '\n' });
                     if (line.StartsWith("//"))      // deprecated
+                    {
+                        Trace.WriteLine(line);
                         recvIdx = 0; //Trace.WriteLine("com->" + line,"+");
+                    }
                     else
                     {
                         try
