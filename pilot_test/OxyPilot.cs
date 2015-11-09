@@ -28,6 +28,7 @@ namespace pilot_test
                 List<string> keys = Util.GetMemberNames(j, true);
                 keys.Remove("T");
                 keys.Remove("Time");
+                keys.Remove("Flag");
                 foreach (string k in keys)
                     Series.Add(new LineSeries { Title = k });
             }
@@ -42,10 +43,16 @@ namespace pilot_test
                 }
                 catch (Exception)
                 {
-                    System.Diagnostics.Debugger.Break();
+                    Series.Remove(ls);
+                    break;
                 }
             }
             // todo would be nice if we could invalidate plot that we are attached to here            
+        }
+
+        internal void Reset(dynamic j)
+        {
+            Series.Clear();
         }
     }
 }

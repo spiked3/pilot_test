@@ -53,8 +53,8 @@ namespace pilot_test
 
         void Internal_OnPilotReceive(dynamic j)
         {
-            if (simpleEventFlag)
-                Console.WriteLine("during wait:" + j);
+            //if (simpleEventFlag)
+            //    Console.WriteLine("during wait:" + j);
             switch ((string)(j.T))
             {
                 case "Pose":

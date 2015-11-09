@@ -231,6 +231,10 @@ namespace pilot_test
 
             switch ((string)(j.T))
             {
+                case "TELEM":
+                    if ((string)j.V == "1")
+                        Dispatcher.InvokeAsync(() => { oxy1Model.Reset(j);; });
+                    break;
                 case "Log":
                 case "Error":
                 case "Debug":
@@ -325,6 +329,15 @@ namespace pilot_test
                 Pilot.OnPilotReceive -= Pilot_OnReceive;
                 Pilot.Close();
             }
+        }
+
+        int telemFlag = 0;
+
+        [UiButton("Telem", "Black", "White")]
+        public void Telem_Click(object sender, RoutedEventArgs e)
+        {
+            _T();
+            Pilot.Send(new { Cmd = "TELEM", Flag = (++telemFlag % 3) });
         }
 
         [UiButton("Esc", "Black", "White", isToggle = true)]
