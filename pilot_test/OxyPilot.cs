@@ -1,6 +1,7 @@
 ﻿using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using spiked3;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;

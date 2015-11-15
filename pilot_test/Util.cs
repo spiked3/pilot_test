@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace pilot_test
 {
-    public static class Util
-    {
-        public static IEnumerable<string> GetMemberNames(object target, bool dynamicOnly = false)
-        {
-            var tList = new List<string>();
-            if (!dynamicOnly)
-                tList.AddRange(target.GetType().GetProperties().Select(it => it.Name));
+    //public static class Util
+    //{
+    //    public static IEnumerable<string> GetMemberNames(object target, bool dynamicOnly = false)
+    //    {
+    //        var tList = new List<string>();
+    //        if (!dynamicOnly)
+    //            tList.AddRange(target.GetType().GetProperties().Select(it => it.Name));
 
-            var tTarget = target as IDynamicMetaObjectProvider;
-            if (tTarget != null)
-                tList.AddRange(tTarget.GetMetaObject(Expression.Constant(tTarget)).GetDynamicMemberNames());
-            return tList;
-        }
-    }
+    //        var tTarget = target as IDynamicMetaObjectProvider;
+    //        if (tTarget != null)
+    //            tList.AddRange(tTarget.GetMetaObject(Expression.Constant(tTarget)).GetDynamicMemberNames());
+    //        return tList;
+    //    }
+    //}
 }

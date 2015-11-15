@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,12 +8,26 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
+using System.Linq.Expressions;
+
 
 // ...
 namespace spiked3
 {
-    public static class extensions
+    public static class Util
     {
+        public static IEnumerable<string> GetMemberNames(object target, bool dynamicOnly = false)
+        {
+            var tList = new List<string>();
+            if (!dynamicOnly)
+                tList.AddRange(target.GetType().GetProperties().Select(it => it.Name));
+
+            var tTarget = target as IDynamicMetaObjectProvider;
+            if (tTarget != null)
+                tList.AddRange(tTarget.GetMetaObject(System.Linq.Expressions.Expression.Constant(tTarget)).GetDynamicMemberNames());
+            return tList;
+        }
+
         /* test case
         byte[] b = new byte[] { 0x61,0x62,0x63};
         uint crc = spiked3.extensions.CRC8(b, 3); // sb 0x5f

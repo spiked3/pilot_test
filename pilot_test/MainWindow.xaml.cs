@@ -337,7 +337,7 @@ namespace pilot_test
         public void Telem_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "TELEM", Flag = (++telemFlag % 4) });
+            Pilot.Send(new { Cmd = "TELEM", Flag = (++telemFlag % 5) });
         }
 
         [UiButton("Esc", "Black", "White", isToggle = true)]
