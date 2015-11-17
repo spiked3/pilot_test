@@ -30,8 +30,6 @@ namespace pilot_test
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        #region dp
-
         public float MotorPower
         {
             get { return (float)GetValue(MotorPowerProperty); }
@@ -113,17 +111,13 @@ namespace pilot_test
         public static readonly DependencyProperty TurnPwrProperty =
             DependencyProperty.Register("TurnPwr", typeof(float), typeof(MainWindow), new PropertyMetadata(Settings.Default.TurnPwr));
 
-        #endregion
+        //---W
 
         string mqttBroker = "127.0.0.1";
 
         public static MainWindow _theInstance;
         Pilot Pilot;
         
-        const float travelThreshold = 0.1F;
-        const float turnThreshold = 10F;
-        const float turnBase = 20F;
-
         public ObservableCollection<ButtonBase> CommandList { get { return _CommandList; } set { _CommandList = value; OnPropertyChanged(); } }
         ObservableCollection<ButtonBase> _CommandList = new ObservableCollection<ButtonBase>();
 
@@ -298,7 +292,7 @@ namespace pilot_test
         // ---------------------- commands
 
         [UiButton("Serial", "Black", "White", isToggle = true)]
-        public void ToggleButton_Serial(object sender, RoutedEventArgs e)
+        public void toggleButton_Serial(object sender, RoutedEventArgs e)
         {
             //_T();
             if ((sender as ToggleButton).IsChecked ?? false)
@@ -315,7 +309,7 @@ namespace pilot_test
         }
 
         [UiButton("MQTT", "Black", "White", isToggle = true)]
-        public void ToggleButton_MQTT(object sender, RoutedEventArgs e)
+        public void toggleButton_MQTT(object sender, RoutedEventArgs e)
         {
             //_T();
             if ((sender as ToggleButton).IsChecked ?? false)
@@ -334,14 +328,14 @@ namespace pilot_test
         int telemFlag = 0;
 
         [UiButton("Telem", "Black", "White")]
-        public void Telem_Click(object sender, RoutedEventArgs e)
+        public void telem_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "TELEM", Flag = (++telemFlag % 5) });
         }
 
         [UiButton("Esc", "Black", "White", isToggle = true)]
-        public void ToggleButton_Esc(object sender, RoutedEventArgs e)
+        public void toggleButton_Esc(object sender, RoutedEventArgs e)
         {
             _T();
             int OnOff = (sender as ToggleButton).IsChecked ?? false ? 1 : 0;
@@ -349,7 +343,7 @@ namespace pilot_test
         }
 
         [UiButton("Reset", "Black", "Yellow")]
-        public void ResetPose_Click(object sender, RoutedEventArgs e)
+        public void resetPose_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "RESET" });
@@ -369,7 +363,7 @@ namespace pilot_test
         }
 
         [UiButton("Config")]
-        public void Config_Click(object sender, RoutedEventArgs e)
+        public void config_Click(object sender, RoutedEventArgs e)
         {
             _T();
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
@@ -380,28 +374,28 @@ namespace pilot_test
         const float RotatePower = 50.0F, MovePower = 40.0F;
 
         [UiButton("ROT 180.0")]
-        public void RotaTest_Click(object sender, RoutedEventArgs e)
+        public void rotaTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = RotatePower });
         }
 
         [UiButton("ROT +10")]
-        public void RotPlus10_Click(object sender, RoutedEventArgs e)
+        public void rotPlus10_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 10.0F, Pwr = RotatePower });
         }
 
         [UiButton("ROT -30")]
-        public void RotMinus30_Click(object sender, RoutedEventArgs e)
+        public void rotMinus30_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = RotatePower });
         }
 
-        [UiButton("MOV 1.0")]
-        public void MovTest_Click(object sender, RoutedEventArgs e)
+        [UiButton("MOV 10.0")]
+        public void movTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "MOV", Dist = 10.0F, Pwr = MovePower });

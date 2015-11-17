@@ -37,11 +37,9 @@ namespace pilot_test
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
             Pilot.Send(new { Cmd = "CONFIG", TPM = 336, MMX = 450, StrRv = -1 });
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
-            //Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { 0.5F, 0.4F, 0.004F } });
 
             Pilot.Send(new { Cmd = "RESET"});
             Pilot.Send(new { Cmd = "ESC", Value = 1 });
-
 
             Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
             Pilot.waitForEvent();
@@ -51,7 +49,6 @@ namespace pilot_test
             Pilot.waitForEvent();
             Pilot.Send(new { Cmd = "ROT", Hdg = 0.0 });
             Pilot.waitForEvent();
-
 
             Pilot.Send(new { Cmd = "ESC", Value = 0 });
         }

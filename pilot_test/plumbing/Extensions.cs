@@ -11,9 +11,9 @@ using System.Windows.Threading;
 using System.Linq.Expressions;
 
 
-// ...
 namespace spiked3
 {
+    //+ Utility functions and extensions
     public static class Util
     {
         public static IEnumerable<string> GetMemberNames(object target, bool dynamicOnly = false)
@@ -115,23 +115,6 @@ namespace spiked3
         public static Color ToColor(this string t)
         {
             return (Color)ColorConverter.ConvertFromString(t);
-
-            /*
-            Color c;
-            if (t.StartsWith("#"))
-            {
-                byte r = Convert.ToByte(t.Substring(1, 2), 16);
-                byte g = Convert.ToByte(t.Substring(3, 2), 16);
-                byte b = Convert.ToByte(t.Substring(5, 2), 16);
-                c = Color.FromRgb(r, g, b);
-            }
-            else
-            {
-                //var x = System.Drawing.Color.FromName(t);
-                c = (Color)ColorConverter.ConvertFromString(t);
-            }
-            return c;
-             * */
         }
 
         public static double Map(this double x, double in_min, double in_max, double out_min, double out_max)
@@ -154,12 +137,10 @@ namespace spiked3
             return Encoding.UTF8.GetBytes(s);
         }
 
-
         public static void DoEvents(this Dispatcher d)
         {
             d.Invoke(DispatcherPriority.Background, new Action(delegate { }));
         }
-
 
         public static T TryFindParent<T>(this DependencyObject child)
             where T : DependencyObject
@@ -210,22 +191,19 @@ namespace spiked3
             return VisualTreeHelper.GetParent(child);
         }
 
-        static double d2r = Math.PI / 180.0;
-        static double r2d = 180.0 / Math.PI;
-
         public static double inRadians(this double deg)
         {
-            return deg * d2r;
+            return deg * Math.PI / 180.0;
         }
 
         public static double inRadians(this int deg)
         {
-            return deg * d2r;
+            return deg * Math.PI / 180.0;
         }
 
         public static double inDegrees(this double rad)
         {
-            return rad * r2d;
+            return rad * 180.0 / Math.PI;
         }
 
     }
