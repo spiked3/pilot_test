@@ -43,9 +43,11 @@ namespace pilot_test
 
             Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
             Pilot.waitForEvent();
-            Pilot.Send(new { Cmd = "ROT", Hdg = 180.0 });
+            var hdgTo0 = Math.Atan2(-Y, -X) * 180 / Math.PI;
+            Pilot.Send(new { Cmd = "ROT", Hdg = hdgTo0 });
             Pilot.waitForEvent();
-            Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Hdg = 180.0, Pwr = 40.0F });
+            var distTo0 = Math.Sqrt(X * X + Y * Y); // todo why is XY not getting updated?
+            Pilot.Send(new { Cmd = "MOV", Dist = 1, Hdg = 180.0, Pwr = 40.0F });
             Pilot.waitForEvent();
             Pilot.Send(new { Cmd = "ROT", Hdg = 0.0 });
             Pilot.waitForEvent();

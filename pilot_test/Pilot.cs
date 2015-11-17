@@ -62,7 +62,10 @@ namespace pilot_test
                     Y = j.Y;
                     H = j.H;
                     break;
-
+                case "Bumper":
+                    if (j.V == 1)
+                        throw new NotImplementedException();
+                    break;
                 case "Event":
                 case "Move":
                 case "Rotate":
