@@ -37,10 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="M2Mqtt.Net, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\M2Mqtt.4.2.0.1\lib\net45\M2Mqtt.Net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="NDesk.Options, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
       <Private>True</Private>
@@ -84,14 +80,10 @@
     </ApplicationDefinition>
     <Compile Include="CurrentTest.cs" />
     <Compile Include="JoystickControl.cs" />
-    <Compile Include="Pilot.cs" />
     <Compile Include="PidPanel.xaml.cs">
       <DependentUpon>PidPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="OxyPilot.cs" />
-    <Compile Include="PilotSerial.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -157,6 +149,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="plumbing\Clean.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\S3Pilot\S3Pilot.csproj">
+      <Project>{c1be6df9-72e3-4403-8304-669d208913ce}</Project>
+      <Name>S3Pilot</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

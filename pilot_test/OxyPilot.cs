@@ -17,11 +17,11 @@ namespace pilot_test
 
         public OxyPilot()
         {
-            Axes.Add(new OxyPlot.Axes.DateTimeAxis { });
-            Axes.Add(new OxyPlot.Axes.LinearAxis { });
+            Axes.Add(new DateTimeAxis { });
+            Axes.Add(new LinearAxis { });
         }
 
-        public void Append(dynamic j)
+        public void Append(IPlotView plot, dynamic j)
         {
             // the first message (with data) sets the keys to plot
             if (Series.Count == 0)
@@ -48,7 +48,7 @@ namespace pilot_test
                     break;
                 }
             }
-            // todo would be nice if we could invalidate plot that we are attached to here            
+            plot.InvalidatePlot();
         }
 
         internal void Reset(dynamic j)

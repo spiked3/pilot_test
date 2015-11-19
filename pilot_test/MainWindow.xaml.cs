@@ -1,5 +1,4 @@
 using System;
-using System.IO.Ports;
 using System.Text;
 using System.Windows;
 using System.Diagnostics;
@@ -16,11 +15,8 @@ using System.Windows.Media;
 using System.Linq;
 using System.Reflection;
 using OxyPlot;
-using OxyPlot.Series;
-using OxyPlot.Axes;
-using uPLibrary.Networking.M2Mqtt;
-using uPLibrary.Networking.M2Mqtt.Messages;
 using NDesk.Options;
+using Spiked3;
 
 // todo open separate oxyplot window if/when received telemetry (and elliminate it from UI)
 
@@ -235,7 +231,7 @@ namespace pilot_test
                     Dispatcher.InvokeAsync(() => { RecieveLog(j); });
                     break;
                 case "Telemetry":
-                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(j); oxy1.InvalidatePlot(); });
+                    Dispatcher.InvokeAsync(() => { oxy1Model.Append(oxy1, j); });
                     break;
                 case "Pose":
                     Dispatcher.InvokeAsync(() => { ReceivedPose(j); });
@@ -245,8 +241,9 @@ namespace pilot_test
                 case "Bumper":
                     Dispatcher.InvokeAsync(() => { ReceivedEvent(j); });
                     break;
-                //default:
-                    //throw new NotImplementedException();
+                default:
+                    Debugger.Break();
+                    throw new NotImplementedException();
             }
         }
 
