@@ -129,7 +129,8 @@ namespace Spiked3
             Trace.WriteLine($"Serial opened({Serial.IsOpen}) on {Serial.PortName}", "2");
         }
 
-        private void Serial_OnReceive(dynamic json)
+        // normally this would be private, but it is a back door in to simulation
+        public void Serial_OnReceive(dynamic json)
         {
             if (OnPilotReceive != null)
                 OnPilotReceive(json);
