@@ -324,14 +324,14 @@ namespace pilot_test
 
         int telemFlag = 0;
 
-        [UiButton("Telem", "Black", "White")]
+        [UiButton("Telem\nCycle", "Black", "White")]
         public void telem_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "TELEM", Flag = (++telemFlag % 5) });
         }
 
-        [UiButton("Esc", "Black", "White", isToggle = true)]
+        [UiButton("Esc", "White", "Red", isToggle = true)]
         public void toggleButton_Esc(object sender, RoutedEventArgs e)
         {
             _T();
@@ -359,53 +359,70 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "CONFIG", mPID = new float[] { MotorPid.Kp, MotorPid.Ki, MotorPid.Kd } });
         }
 
-        [UiButton("Config")]
+        [UiButton("Config", "Black", "Cyan")]
         public void config_Click(object sender, RoutedEventArgs e)
         {
             _T();
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", TPM = 336, MMX = 450, StrRv = -1});
+            Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1});
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
+        }
+
+        [UiButton("TPM Calc", "White", "Orange")]
+        public void TpmCalculator(object sender, EventArgs e)
+        {
+            var d = new TpmCalc { CurrentTPM = 336, Owner = this };
+            if (d.ShowDialog() ?? false)
+            {
+                // actually we dont do anything with the results, up to the user/programmer
+            }
         }
 
         const float RotatePower = 50.0F, MovePower = 40.0F;
 
-        [UiButton("ROT 180.0")]
+        [UiButton("ROT\n180", "White", "Blue")]
         public void rotaTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 180.0F, Pwr = RotatePower });
         }
 
-        [UiButton("ROT +10")]
+        [UiButton("ROT\n+10", "White", "Blue")]
         public void rotPlus10_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 10.0F, Pwr = RotatePower });
         }
 
-        [UiButton("ROT -30")]
+        [UiButton("ROT\n-30", "White", "Blue")]
         public void rotMinus30_Click(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = RotatePower });
         }
 
-        [UiButton("MOV 10.0")]
+        [UiButton("MOV\n3@H", "White", "Green")]
         public void movTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "MOV", Dist = 10.0F, Pwr = MovePower });
+            Pilot.Send(new { Cmd = "MOV", Dist = 3, Pwr = 40.0F });
         }
 
-        [UiButton("rotate +90")]
+        [UiButton("MOV\n3@0", "White", "Green")]
+        public void movTest2_Click(object sender, RoutedEventArgs e)
+        {
+            _T();
+            Pilot.Send(new { Cmd = "MOV", Dist = 3, Pwr = 30.0F, Hdg = 0 });
+        }
+
+        [UiButton("ROT\n+90", "White", "Blue")]
         public void rotPlus90(object sender, RoutedEventArgs e)
         {
             _T();
             Pilot.Send(new { Cmd = "ROT", Hdg = H + 90.0F, Pwr = RotatePower });
         }
 
-        [UiButton("rotate -90")]
+        [UiButton("ROT\n-90", "White", "Blue")]
         public void rotMinus90(object sender, RoutedEventArgs e)
         {
             _T();

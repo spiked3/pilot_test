@@ -34,7 +34,7 @@ namespace pilot_test
             Pilot.OnPilotReceive += Pilot_OnReceive;
 
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", TPM = 336, MMX = 450, StrRv = -1 });
+            Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1 });
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
             Pilot.Send(new { Cmd = "RESET"});
             Pilot.Send(new { Cmd = "ESC", Value = 1 });

@@ -23,6 +23,8 @@ namespace pilot_test
 
         public void Append(IPlotView plot, dynamic j)
         {
+            if (j.Flag == 1)
+                System.Diagnostics.Debugger.Break();
             // the first message (with data) sets the keys to plot
             if (Series.Count == 0)
             {
