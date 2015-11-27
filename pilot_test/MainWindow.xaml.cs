@@ -152,7 +152,7 @@ namespace pilot_test
             Height = Settings.Default.Height;
             Top = Settings.Default.Top;
             Left = Settings.Default.Left;
-            mainGrid.RowDefinitions[1].Height = new GridLength(Settings.Default.Split1);
+            mainGrid.RowDefinitions[0].Height = new GridLength(Settings.Default.Split1);
 
             if (Width == 0 || Height == 0)
             {
@@ -167,7 +167,7 @@ namespace pilot_test
             Settings.Default.Height = Height;
             Settings.Default.Top = Top;
             Settings.Default.Left = Left;
-            Settings.Default.Split1 = mainGrid.RowDefinitions[1].Height.Value;
+            Settings.Default.Split1 = mainGrid.RowDefinitions[0].Height.Value;
 
             Settings.Default.MotorKp = MotorPid.Kp;
             Settings.Default.MotorKi = MotorPid.Ki;
@@ -371,7 +371,7 @@ namespace pilot_test
         [UiButton("TPM Calc", "White", "Orange")]
         public void TpmCalculator(object sender, EventArgs e)
         {
-            var d = new TpmCalc { CurrentTPM = 336, Owner = this };
+            var d = new TpmCalc { CurrentTPM = 336, Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
             if (d.ShowDialog() ?? false)
             {
                 // actually we dont do anything with the results, up to the user/programmer

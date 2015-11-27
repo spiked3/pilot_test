@@ -41,8 +41,9 @@ namespace pilot_test
 
             Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
             Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
-            
-            var hdgTo0 = Math.Atan2(X, -Y) * 180 / Math.PI;
+
+            var hdgTo0 = 180;
+            //var hdgTo0 = Math.Atan2(X, -Y) * 180 / Math.PI;
             Pilot.Send(new { Cmd = "ROT", Hdg = hdgTo0 });
             Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
 
