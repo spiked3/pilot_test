@@ -28,6 +28,23 @@ namespace pilot_test
         [UiButton("NavPlanTest")]
         public void CurrentTest(object sender, RoutedEventArgs e)
         {
+            //Pilot = Pilot.Factory("192.168.42.1");
+            //Pilot = Pilot.Factory("127.0.0.1");
+            Pilot = Pilot.Factory("com3");
+            Pilot.OnPilotReceive += Pilot_OnReceive;
+
+            Pilot.Send(new { Cmd = "SRVO", Value = 10 });
+            System.Threading.Thread.Sleep(500);
+            Pilot.Send(new { Cmd = "SRVO", Value = 90 });
+            System.Threading.Thread.Sleep(500);
+            Pilot.Send(new { Cmd = "SRVO", Value = 170 });
+            System.Threading.Thread.Sleep(500);
+
+            Pilot.Send(new { Cmd = "SRVO", Value = 90 });
+        }
+
+        public void CurrentTestX(object sender, RoutedEventArgs e)
+        {
             Pilot = Pilot.Factory("192.168.42.1");
             //Pilot = Pilot.Factory("127.0.0.1");
             //Pilot = Pilot.Factory("com15");

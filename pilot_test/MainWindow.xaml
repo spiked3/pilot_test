@@ -11,19 +11,19 @@
         >
     <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
         <Menu DockPanel.Dock="Top" d:IsLocked="True" ItemsSource="{Binding CommandList}" Padding="4">
-                <Menu.Resources>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Width" Value="78" />
-                        <Setter Property="Height" Value="42" />
-                        <Setter Property="Margin" Value="4" />
-                    </Style>
-                    <Style TargetType="{x:Type ToggleButton}">
-                        <Setter Property="Width" Value="78" />
-                        <Setter Property="Height" Value="42      " />
-                        <Setter Property="Margin" Value="4" />
-                        <Setter Property="Background" Value="WhiteSmoke" />
-                    </Style>
-                </Menu.Resources>                    
+            <Menu.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Width" Value="78" />
+                    <Setter Property="Height" Value="42" />
+                    <Setter Property="Margin" Value="4" />
+                </Style>
+                <Style TargetType="{x:Type ToggleButton}">
+                    <Setter Property="Width" Value="78" />
+                    <Setter Property="Height" Value="42      " />
+                    <Setter Property="Margin" Value="4" />
+                    <Setter Property="Background" Value="WhiteSmoke" />
+                </Style>
+            </Menu.Resources>       
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" d:IsLocked="True" >
             <StackPanel Orientation="Horizontal" >

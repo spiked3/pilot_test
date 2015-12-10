@@ -17,6 +17,7 @@ using System.Reflection;
 using OxyPlot;
 using NDesk.Options;
 using Spiked3;
+using System.Windows.Data;
 
 // todo open separate oxyplot window if/when received telemetry (and elliminate it from UI)
 
@@ -24,8 +25,17 @@ using Spiked3;
 
 namespace pilot_test
 {
+
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public string PilotString
+        {
+            get { return (string)GetValue(PilotStringProperty); }
+            set { SetValue(PilotStringProperty, value); }
+        }
+        public static readonly DependencyProperty PilotStringProperty =
+            DependencyProperty.Register("PilotString", typeof(string), typeof(MainWindow), new PropertyMetadata("127.0.0.1"));
+
         public float MotorPower
         {
             get { return (float)GetValue(MotorPowerProperty); }
@@ -109,8 +119,6 @@ namespace pilot_test
 
         //---W
 
-        string mqttBroker = "127.0.0.1";
-
         public static MainWindow _theInstance;
         Pilot Pilot;
         
@@ -143,7 +151,7 @@ namespace pilot_test
 
             var p = new OptionSet
             {
-                   { "mqtt=", (v) => { mqttBroker = v; } },
+                   { "pilot=", (v) => { PilotString = v; } },
             };
 
             p.Parse(Environment.GetCommandLineArgs());
@@ -188,6 +196,12 @@ namespace pilot_test
             ButtonBase b;
             spiked3.Console.MessageLevel = 4;   // default
             Trace.WriteLine("Pilot Test Program", "+");
+
+            TextBox tb = new TextBox { Width = 96, VerticalContentAlignment = System.Windows.VerticalAlignment.Center };
+            tb.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath("PilotString") } );
+            b = new ToggleButton { Content = tb, Foreground = Brushes.Black, Background = Brushes.White, Style = (Style)FindResource("UiToggle"), Width = 128 };
+            b.Click += PilotButton_Click;
+            CommandList.Add(b);
 
             foreach (MemberInfo mi in GetType().GetMembers())
             {
@@ -288,39 +302,66 @@ namespace pilot_test
 
         // ---------------------- commands
 
-        [UiButton("Serial", "Black", "White", isToggle = true)]
-        public void toggleButton_Serial(object sender, RoutedEventArgs e)
+        public void PilotButton_Click(object sender, RoutedEventArgs e)
         {
             //_T();
-            if ((sender as ToggleButton).IsChecked ?? false)
+            if (((ToggleButton)sender)?.IsChecked ?? false)
             {
-                Pilot = Pilot.Factory("com15");
+                if (Pilot != null)
+                {
+                    Pilot.OnPilotReceive -= Pilot_OnReceive;
+                    Pilot.Close();
+                }
+
+                Pilot = Pilot.Factory(PilotString);
                 Pilot.OnPilotReceive += Pilot_OnReceive;
-                CommStatus = Pilot.CommStatus;
             }
-            else if (Pilot != null)
+            else
             {
-                Pilot.OnPilotReceive -= Pilot_OnReceive;
-                Pilot.Close();
+                if (Pilot != null)
+                {
+                    Pilot.Close();
+                    Pilot.OnPilotReceive -= Pilot_OnReceive;
+                }
             }
+
+            CommStatus = Pilot.CommStatus;
+
         }
 
-        [UiButton("MQTT", "Black", "White", isToggle = true)]
-        public void toggleButton_MQTT(object sender, RoutedEventArgs e)
-        {
-            //_T();
-            if ((sender as ToggleButton).IsChecked ?? false)
-            {
-                Pilot = Pilot.Factory(mqttBroker);
-                Pilot.OnPilotReceive += Pilot_OnReceive;
-                CommStatus = Pilot.CommStatus;
-            }
-            else if (Pilot != null)
-            {
-                Pilot.OnPilotReceive -= Pilot_OnReceive;
-                Pilot.Close();
-            }
-        }
+        //[UiButton("Serial", "Black", "White", isToggle = true)]
+        //public void toggleButton_Serial(object sender, RoutedEventArgs e)
+        //{
+        //    //_T();
+        //    if ((sender as ToggleButton).IsChecked ?? false)
+        //    {
+        //        Pilot = Pilot.Factory("com15");
+        //        Pilot.OnPilotReceive += Pilot_OnReceive;
+        //        CommStatus = Pilot.CommStatus;
+        //    }
+        //    else if (Pilot != null)
+        //    {
+        //        Pilot.OnPilotReceive -= Pilot_OnReceive;
+        //        Pilot.Close();
+        //    }
+        //}
+
+        //[UiButton("Pilot", "Black", "White", isToggle = true)]
+        //public void toggleButton_MQTT(object sender, RoutedEventArgs e)
+        //{
+        //    //_T();
+        //    if ((sender as ToggleButton).IsChecked ?? false)
+        //    {
+        //        Pilot = Pilot.Factory(PilotString);
+        //        Pilot.OnPilotReceive += Pilot_OnReceive;
+        //        CommStatus = Pilot.CommStatus;
+        //    }
+        //    else if (Pilot != null)
+        //    {
+        //        Pilot.OnPilotReceive -= Pilot_OnReceive;
+        //        Pilot.Close();
+        //    }
+        //}
 
         int telemFlag = 0;
 
@@ -364,8 +405,13 @@ namespace pilot_test
         {
             _T();
             //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1});
+            // mikes original
+            Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1 });
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
+            // daves
+            //Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = 1 });
+            //Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, 1 }, M2 = new int[] { -1, -1 } });
+
         }
 
         [UiButton("TPM Calc", "White", "Orange")]
@@ -452,6 +498,21 @@ namespace pilot_test
             _T();
             Pilot.Send(new { Cmd = "MOV", M1 = 0, M2 = 0 });
         }
+
+        [UiButton("Srvo 90", "White", "Orange")]
+        public void srvo90(object sender, RoutedEventArgs e)
+        {
+            _T();
+            Pilot.Send(new { Cmd = "SRVO", Value = 90 });
+        }
+
+        [UiButton("Srvo 10", "White", "Orange")]
+        public void srvo10(object sender, RoutedEventArgs e)
+        {
+            _T();
+            Pilot.Send(new { Cmd = "SRVO", Value = 10 });
+        }
+
     }
 
     [AttributeUsage(AttributeTargets.Method)]
