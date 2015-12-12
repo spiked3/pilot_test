@@ -20,7 +20,7 @@ namespace Spiked3
          PilotSerial Serial;
          float X, Y, H;
          Thread serialThread;
-         TimeSpan defaultWaitTimeOut = new TimeSpan(0, 0, 0, 45);		// time out in seconds
+         TimeSpan defaultWaitTimeOut = new TimeSpan(0, 0, 0, 10);		// time out in seconds
          bool simpleEventFlag;
 
         public string CommStatus { get; internal set; }
@@ -92,7 +92,16 @@ namespace Spiked3
                 case "robot1":
                     string j = Encoding.UTF8.GetString(e.Message);
                     if (OnPilotReceive != null)
-                        OnPilotReceive(JsonConvert.DeserializeObject(j));
+                    {
+                        try
+                        {
+                            OnPilotReceive(JsonConvert.DeserializeObject(j));
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.WriteLine($"json deserialize threw exception, code {ex.Message}");
+                        }
+                    }
                     break;
             }
         }
@@ -188,7 +197,7 @@ namespace Spiked3
                     Send(new { Cmd = "ESC", Value = 0 });
                     Trace.WriteLine("TimeOut waiting for event");
                     throw new TimeoutException();
-                    //return false;
+                    return false;
                 }
             }
             return true;

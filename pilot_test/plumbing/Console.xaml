@@ -28,7 +28,7 @@
                 <Slider Minimum="0" Maximum="5" TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True" Value="{Binding MessageLevel,Mode=TwoWay}" ValueChanged="Slider_ValueChanged" Grid.Row="1" Grid.ColumnSpan="2" />
                 <Button Background="Transparent" Click="Clear_Click" HorizontalAlignment="Right" Padding="2" Grid.Column="2" Grid.RowSpan="2" Margin="4,0">
                     <StackPanel Orientation="Vertical" >
-                        <Image Source="Clean.png" />
+                        <Image Source="Clean.png" Stretch="None" />
                         <TextBlock Text="Clear" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Button>

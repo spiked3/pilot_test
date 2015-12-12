@@ -28,6 +28,14 @@ namespace pilot_test
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public float MoveAmount
+        {
+            get { return (float)GetValue(MoveAmountProperty); }
+            set { SetValue(MoveAmountProperty, value); }
+        }
+        public static readonly DependencyProperty MoveAmountProperty =
+            DependencyProperty.Register("MoveAmount", typeof(float), typeof(MainWindow), new PropertyMetadata(1F));
+
         public string PilotString
         {
             get { return (string)GetValue(PilotStringProperty); }
@@ -197,11 +205,11 @@ namespace pilot_test
             spiked3.Console.MessageLevel = 4;   // default
             Trace.WriteLine("Pilot Test Program", "+");
 
-            TextBox tb = new TextBox { Width = 96, VerticalContentAlignment = System.Windows.VerticalAlignment.Center };
-            tb.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath("PilotString") } );
-            b = new ToggleButton { Content = tb, Foreground = Brushes.Black, Background = Brushes.White, Style = (Style)FindResource("UiToggle"), Width = 128 };
-            b.Click += PilotButton_Click;
-            CommandList.Add(b);
+            //TextBox tb = new TextBox { Width = 96, VerticalContentAlignment = System.Windows.VerticalAlignment.Center };
+            //tb.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath("PilotString") } );
+            //b = new ToggleButton { Content = tb, Foreground = Brushes.Black, Background = Brushes.White, Style = (Style)FindResource("UiToggle"), Width = 128 };
+            //b.Click += PilotButton_Click;
+            //CommandList.Add(b);
 
             foreach (MemberInfo mi in GetType().GetMembers())
             {
@@ -302,6 +310,7 @@ namespace pilot_test
 
         // ---------------------- commands
 
+            [UiButton("Pilot",isToggle =true)]
         public void PilotButton_Click(object sender, RoutedEventArgs e)
         {
             //_T();
@@ -408,6 +417,7 @@ namespace pilot_test
             // mikes original
             Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1 });
             Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
+            Pilot.Send(new { Cmd = "CONFIG", HPID = new float[] { 50f, .8f, .04f } });
             // daves
             //Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = 1 });
             //Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, 1 }, M2 = new int[] { -1, -1 } });
@@ -447,18 +457,25 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "ROT", Hdg = H - 30.0F, Pwr = RotatePower });
         }
 
-        [UiButton("MOV\n3@H", "White", "Green")]
+        [UiButton("MOV\nX@H", "White", "Green")]
         public void movTest_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "MOV", Dist = 3, Pwr = 40.0F });
+            Pilot.Send(new { Cmd = "MOV", Dist = MoveAmount, Pwr = 40.0F });
         }
 
-        [UiButton("MOV\n3@0", "White", "Green")]
+        [UiButton("MOV\nX@0", "White", "Green")]
         public void movTest2_Click(object sender, RoutedEventArgs e)
         {
             _T();
-            Pilot.Send(new { Cmd = "MOV", Dist = 3, Pwr = 30.0F, Hdg = 0 });
+            Pilot.Send(new { Cmd = "MOV", Dist = MoveAmount, Pwr = 40.0F, Hdg = 0 });
+        }
+
+        [UiButton("MOV\nX@H reverse", "White", "Green")]
+        public void movTest3_Click(object sender, RoutedEventArgs e)
+        {
+            _T();
+            Pilot.Send(new { Cmd = "MOV", Dist = MoveAmount, Pwr = -40.0F, Hdg = H });
         }
 
         [UiButton("ROT\n+90", "White", "Blue")]

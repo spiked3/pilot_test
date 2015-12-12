@@ -10,21 +10,35 @@
         Title="Spiked3.com PilotV2 Tests" Height="894" Width="1100" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="Manual"
         >
     <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
-        <Menu DockPanel.Dock="Top" d:IsLocked="True" ItemsSource="{Binding CommandList}" Padding="4">
-            <Menu.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Width" Value="78" />
-                    <Setter Property="Height" Value="42" />
-                    <Setter Property="Margin" Value="4" />
-                </Style>
-                <Style TargetType="{x:Type ToggleButton}">
-                    <Setter Property="Width" Value="78" />
-                    <Setter Property="Height" Value="42      " />
-                    <Setter Property="Margin" Value="4" />
-                    <Setter Property="Background" Value="WhiteSmoke" />
-                </Style>
-            </Menu.Resources>       
-        </Menu>
+        <DockPanel.Resources >
+            <Style TargetType="Button">
+                <Setter Property="Width" Value="78" />
+                <Setter Property="Height" Value="42" />
+                <Setter Property="Margin" Value="4" />
+            </Style>
+            <Style TargetType="ToggleButton">
+                <Setter Property="Width" Value="78" />
+                <Setter Property="Height" Value="42      " />
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="Background" Value="WhiteSmoke" />
+            </Style>
+            <Style TargetType="Label" >
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="4,0"  />
+            </Style>
+        </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Top" >
+            <Menu >
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Pilot" />
+                    <TextBox Text="{Binding PilotString,FallbackValue=pilotString,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  Width="128"/>
+                    <Label Content="Move Amount" />
+                    <TextBox Text="{Binding MoveAmount,StringFormat=F1,FallbackValue=99.9,UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  Width="64"/>
+                </StackPanel>
+            </Menu>
+            <Menu ItemsSource="{Binding CommandList}" Padding="4">
+            </Menu>
+        </StackPanel>
         <StatusBar DockPanel.Dock="Bottom" d:IsLocked="True" >
             <StackPanel Orientation="Horizontal" >
                 <Label Content="Comm Status:"  Margin="4,0,4,0"/>

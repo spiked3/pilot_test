@@ -25,8 +25,7 @@ namespace pilot_test
 {
     public partial class MainWindow 
     {
-        [UiButton("NavPlanTest")]
-        public void CurrentTest(object sender, RoutedEventArgs e)
+        public void CurrentTestX(object sender, RoutedEventArgs e)
         {
             //Pilot = Pilot.Factory("192.168.42.1");
             //Pilot = Pilot.Factory("127.0.0.1");
@@ -43,35 +42,45 @@ namespace pilot_test
             Pilot.Send(new { Cmd = "SRVO", Value = 90 });
         }
 
-        public void CurrentTestX(object sender, RoutedEventArgs e)
+        [UiButton("NavPlanTest")]
+        public void CurrentTest(object sender, RoutedEventArgs e)
         {
-            Pilot = Pilot.Factory("192.168.42.1");
-            //Pilot = Pilot.Factory("127.0.0.1");
-            //Pilot = Pilot.Factory("com15");
-            Pilot.OnPilotReceive += Pilot_OnReceive;
+            try {
+                Pilot = Pilot.Factory("192.168.42.1");
+                //Pilot = Pilot.Factory("127.0.0.1");
+                //Pilot = Pilot.Factory("com15");
+                Pilot.OnPilotReceive += Pilot_OnReceive;
 
-            //Pilot.Send(new { Cmd = "CONFIG", MPU = new int[] { -4526, -136, 1990, 48, -26, -21 } });
-            Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1 });
-            Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
-            Pilot.Send(new { Cmd = "RESET"});
-            Pilot.Send(new { Cmd = "ESC", Value = 1 });
+                Pilot.Send(new { Cmd = "CONFIG", TPM = 353, MMX = 450, StrRv = -1 });
+                Pilot.Send(new { Cmd = "CONFIG", M1 = new int[] { 1, -1 }, M2 = new int[] { -1, 1 } });
+                Pilot.Send(new { Cmd = "CONFIG", HPID = new float[] { 75f, .8f, .04f } });
 
-            Pilot.Send(new { Cmd = "MOV", Dist = 1.0, Pwr = 40.0F });
-            Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
+                Pilot.Send(new { Cmd = "RESET" });
+                Pilot.Send(new { Cmd = "ESC", Value = 1 });
 
-            var hdgTo0 = 180;
-            //var hdgTo0 = Math.Atan2(X, -Y) * 180 / Math.PI;
-            Pilot.Send(new { Cmd = "ROT", Hdg = hdgTo0 });
-            Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
+                Pilot.Send(new { Cmd = "MOV", Dist = 1, Pwr = 40 });
+                Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
 
-            var distTo0 = Math.Sqrt(X * X + Y * Y);
-            Pilot.Send(new { Cmd = "MOV", Dist = distTo0, Hdg = hdgTo0, Pwr = 40.0F });
-            Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
+                //var hdgTo0 = 180;
+                float hdgTo0 = (float)(Math.Atan2(X, -Y) * 180 / Math.PI);
+                Pilot.Send(new { Cmd = "ROT", Hdg = hdgTo0 });
+                Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
 
-            Pilot.Send(new { Cmd = "ROT", Hdg = 0.0 });
-            Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
+                float distTo0 = (float)(Math.Sqrt(X * X + Y * Y));
+                Pilot.Send(new { Cmd = "MOV", Dist = distTo0, Hdg = hdgTo0, Pwr = 40.0F });
+                Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
 
-            Pilot.Send(new { Cmd = "ESC", Value = 0 });
+                Pilot.Send(new { Cmd = "ROT", Hdg = 0.0 });
+                Pilot.waitForEvent(); Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { })); // doEvents
+
+                Pilot.Send(new { Cmd = "ESC", Value = 0 });
+            }
+            catch (TimeoutException)
+            {
+                Trace.WriteLine("Timeout waiting for event");
+                Pilot.Send(new { Cmd = "ESC", Value = 0 });
+                Pilot.Send(new { Cmd = "MOV", M1 = 0, M2 = 0 });
+            }
         }
     }
 }
